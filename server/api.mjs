@@ -2,7 +2,14 @@
 // Env: BREVO_API_KEY (required), BREVO_LIST_ID, LEAD_TO, MAIL_FROM, API_PORT
 import http from 'node:http'
 
-const KEY = process.env.BREVO_API_KEY || ''
+// accepts a plain xkeysib- key, or the base64 {"api_key": ...} form Brevo shows for MCP
+function readKey(raw) {
+  raw = String(raw || '').trim()
+  if (!raw || raw.startsWith('xkeysib-')) return raw
+  try { const j = JSON.parse(Buffer.from(raw, 'base64').toString('utf8')); if (j && j.api_key) return String(j.api_key) } catch {}
+  return raw
+}
+const KEY = readKey(process.env.BREVO_API_KEY)
 const LIST_ID = Number(process.env.BREVO_LIST_ID || 0)
 const LEAD_TO = (process.env.LEAD_TO || 'hello@ottawadeckpro.ca').split(',').map((s) => s.trim()).filter(Boolean)
 const FROM = { name: 'Ottawa Deck Pro', email: process.env.MAIL_FROM || 'hello@ottawadeckpro.ca' }
@@ -18,6 +25,7 @@ const clean = (s, n = 2000) => String(s ?? '').trim().slice(0, n)
 const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
 
 // simple per-IP rate limit: 8 submissions per 10 minutes
+let lastError = null
 const hits = new Map()
 function limited(ip) {
   const now = Date.now(), list = (hits.get(ip) || []).filter((t) => now - t < 600000)
@@ -122,7 +130,13 @@ http.createServer(async (req, res) => {
   const send = (status, obj) => { res.writeHead(status, { 'content-type': 'application/json', 'cache-control': 'no-store' }); res.end(JSON.stringify(obj)) }
   try {
     const route = req.url.split('?')[0]
-    if (req.method === 'GET' && route === '/api/health') return send(200, { ok: true, brevo: !!KEY, list: !!LIST_ID })
+    if (req.method === 'GET' && route === '/api/health') {
+      const out = { ok: true, brevo: !!KEY, list: !!LIST_ID, lastError, keyFormat: KEY.startsWith('xkeysib-') ? 'api' : KEY ? 'other' : 'none' }
+      if (KEY && req.url.includes('check=1')) {
+        try { const r = await fetch(BREVO + '/account', { headers: { 'api-key': KEY, accept: 'application/json' } }); out.brevoStatus = r.status; if (!r.ok) out.brevoError = (await r.text()).slice(0, 300) } catch (e) { out.brevoError = e.message }
+      }
+      return send(200, out)
+    }
     if (req.method !== 'POST' || !['/api/lead', '/api/subscribe'].includes(route)) return send(404, { ok: false })
     const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim()
     if (limited(ip)) return send(429, { ok: false, error: 'Too many submissions. Please call ' + PHONE + '.' })
@@ -132,7 +146,7 @@ http.createServer(async (req, res) => {
     const out = route === '/api/lead' ? await lead(fd, ip) : await subscribe(fd, ip)
     send(out.status, out.status === 200 ? { ok: true } : { ok: false, error: out.error })
   } catch (e) {
-    console.error('form error', e.message)
+    console.error('form error', e.message); lastError = { at: new Date().toISOString(), msg: String(e.message).replace(/xkeysib-[\w-]+/g, '[key]').slice(0, 300) }
     send(e.status || 500, { ok: false, error: 'Something went wrong. Please call ' + PHONE + '.' })
   }
 }).listen(PORT, '127.0.0.1', () => console.log('form api on', PORT))
