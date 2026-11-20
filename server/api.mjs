@@ -60,6 +60,55 @@ const rows = (pairs) => `<table role="presentation" width="100%" cellpadding="0"
   .join('')}</table>`
 const btn = (href, label) => `<a href="${href}" style="display:inline-block;background:#7CBC42;color:#121614;font-weight:700;text-decoration:none;padding:12px 22px;border-radius:999px;margin-top:20px">${label}</a>`
 
+
+// warm confirmation the customer gets after the estimate form
+function welcomeEmail({ first, service, area, base }) {
+  const img = (f) => `${base}/img/email/${f}`
+  const font = "font-family:Inter,'Helvetica Neue',Helvetica,Arial,sans-serif"
+  return `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"></head>
+<body style="margin:0;padding:0;background:#EFEBE2;${font};color:#20252A">
+<div style="display:none;max-height:0;overflow:hidden">We'll be in touch within 24 hours. In the meantime, here's a look at what we build.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#EFEBE2"><tr><td align="center" style="padding:28px 12px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:22px;overflow:hidden">
+  <tr><td align="center" style="padding:26px 24px 18px">
+    <img src="${img('ottawa-deck-pro-logo-email.png')}" width="64" height="64" alt="Ottawa Deck Pro" style="display:block;border:0">
+  </td></tr>
+  <tr><td style="padding:0 18px">
+    <img src="${img('ottawa-deck-pro-team-email.jpg')}" width="564" alt="The Ottawa Deck Pro team" style="display:block;width:100%;height:auto;border:0;border-radius:16px">
+  </td></tr>
+  <tr><td align="center" style="padding:30px 32px 6px">
+    <div style="font-size:13px;font-weight:700;letter-spacing:.22em;color:#5C8F31;text-transform:uppercase">Request received</div>
+    <div style="font-size:32px;line-height:1.15;font-weight:800;margin-top:10px;letter-spacing:-.01em">Thanks, ${esc(first)}!<br>We'll be in touch<br>within <span style="color:#5C8F31">24 hours</span>.</div>
+    <div style="font-size:16px;line-height:1.6;color:#5a5f5c;margin-top:14px">The crew is already excited about your ${esc(service.toLowerCase())} project${area ? ' in ' + esc(area) : ''}.</div>
+  </td></tr>
+  <tr><td style="padding:28px 18px 6px">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td width="50%" style="padding:0 6px 0 0;vertical-align:top">
+        <img src="${img('3d-deck-design-email.jpg')}" width="276" alt="3D design of a second-storey composite deck" style="display:block;width:100%;height:auto;border:0;border-radius:14px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#8a8f8b;padding-top:9px;text-align:center">The 3D design</div>
+      </td>
+      <td width="50%" style="padding:0 0 0 6px;vertical-align:top">
+        <img src="${img('built-deck-email.jpg')}" width="276" alt="The same deck built by Ottawa Deck Pro" style="display:block;width:100%;height:auto;border:0;border-radius:14px">
+        <div style="font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#5C8F31;padding-top:9px;text-align:center">Built by our crew</div>
+      </td>
+    </tr></table>
+  </td></tr>
+  <tr><td align="center" style="padding:14px 32px 0">
+    <div style="font-size:15px;line-height:1.6;color:#5a5f5c">Same project, idea to backyard. Yours is next.</div>
+  </td></tr>
+  <tr><td align="center" style="padding:26px 32px 34px">
+    <a href="${SITE}/gallery" style="display:inline-block;background:#7CBC42;color:#121614;font-weight:700;font-size:15px;text-decoration:none;padding:14px 26px;border-radius:999px">See more of our work</a>
+    <div style="font-size:14px;color:#5a5f5c;margin-top:16px">Can't wait? Call or text <a href="tel:6136391744" style="color:#20252A;font-weight:700;text-decoration:none">${PHONE}</a></div>
+  </td></tr>
+  <tr><td style="padding:22px 32px;background:#121614;color:#cfd2cf;font-size:13px;line-height:1.6" align="center">
+    <div style="color:#ffffff;font-weight:700;font-size:14px">Mike, Elie, Sami and the whole crew</div>
+    <div style="color:#9fa39f">(plus Ivy, our unofficial site inspector)</div>
+    <div style="margin-top:12px;font-size:12px;color:#8a8f8b">Ottawa Deck Pro · 6930 Fallowfield Road, Ottawa, ON · <a href="${SITE}" style="color:#9ccf6c">ottawadeckpro.ca</a></div>
+  </td></tr>
+</table>
+</td></tr></table></body></html>`
+}
+
 async function readForm(req) {
   const len = Number(req.headers['content-length'] || 0)
   if (len > MAX_BODY) throw Object.assign(new Error('too large'), { status: 413 })
@@ -67,7 +116,7 @@ async function readForm(req) {
   return request.formData()
 }
 
-async function lead(fd, ip) {
+async function lead(fd, ip, base) {
   const f = (k, n) => clean(fd.get(k), n)
   const name = f('name', 120), email = f('email', 200), phone = f('phone', 40), area = f('area', 120), service = f('service', 80)
   if (!name || !isEmail(email) || phone.replace(/\D/g, '').length < 10 || !area || !service) return { status: 400, error: 'Please fill in the required fields.' }
@@ -91,9 +140,8 @@ async function lead(fd, ip) {
   // confirmation to the customer (a failure here never loses the lead)
   brevo('/smtp/email', {
     sender: FROM, to: [{ email, name }], replyTo: { email: LEAD_TO[0], name: 'Ottawa Deck Pro' },
-    subject: 'We received your project details',
-    htmlContent: shell(`Thanks, ${esc(name.split(' ')[0])}.`, `<p style="font-size:15px;line-height:1.6;margin:0 0 12px">We received your ${esc(service.toLowerCase())} request for ${esc(area)}. Someone from our team will get back to you within 1 business day to talk through your ideas and book a free on-site consultation.</p>
-<p style="font-size:15px;line-height:1.6;margin:0">Have photos, drawings or a deadline to share? Just reply to this email, or call or text us at ${PHONE}.</p>${btn(SITE + '/gallery', 'See our recent projects')}`),
+    subject: `Thanks ${name.split(' ')[0]}, we'll be in touch within 24 hours`,
+    htmlContent: welcomeEmail({ first: name.split(' ')[0], service, area, base }),
     tags: ['lead-confirmation'],
   }).catch((e) => console.error('confirmation failed', e.message))
   console.log('lead sent', ip, service, area)
@@ -143,7 +191,9 @@ http.createServer(async (req, res) => {
     const fd = await readForm(req)
     if (clean(fd.get('company_website'))) return send(200, { ok: true }) // honeypot: pretend success
     if (!KEY) { console.error('BREVO_API_KEY not set'); return send(503, { ok: false, error: 'Form temporarily unavailable. Please call ' + PHONE + '.' }) }
-    const out = route === '/api/lead' ? await lead(fd, ip) : await subscribe(fd, ip)
+    const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim()
+    const base = /^(www\.)?ottawadeckpro\.ca$|\.up\.railway\.app$/.test(host) ? 'https://' + host : SITE
+    const out = route === '/api/lead' ? await lead(fd, ip, base) : await subscribe(fd, ip)
     send(out.status, out.status === 200 ? { ok: true } : { ok: false, error: out.error })
   } catch (e) {
     console.error('form error', e.message); lastError = { at: new Date().toISOString(), msg: String(e.message).replace(/xkeysib-[\w-]+/g, '[key]').slice(0, 300) }
