@@ -18,6 +18,7 @@ Static React SSR + Tailwind rebuild of the old Wix site. Every Wix URL, title, m
 ## Forms (server/api.mjs, Brevo)
 - /api/lead: lead email to hello@ottawadeckpro.ca (photos attached) + branded client confirmation (team photo, "within 24 hours", 3D vs built).
 - /api/subscribe: $5,000 offer list (Brevo list ID 2) + welcome email with offer conditions + notice to owner.
+- /api/unsubscribe: signed one-click link in the welcome email (and List-Unsubscribe header). Blacklists the contact in Brevo and removes it from the list.
 - Railway variables: BREVO_API_KEY, BREVO_LIST_ID. Brevo IP blocking for API keys must stay OFF (Railway IPs rotate).
 - Health: /api/health?check=1
 

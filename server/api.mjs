@@ -1,6 +1,7 @@
 // Ottawa Deck Pro form handler: estimate leads + $5,000 email list, sent through Brevo.
 // Env: BREVO_API_KEY (required), BREVO_LIST_ID, LEAD_TO, MAIL_FROM, API_PORT
 import http from 'node:http'
+import crypto from 'node:crypto'
 
 // accepts a plain xkeysib- key, or the base64 {"api_key": ...} form Brevo shows for MCP
 function readKey(raw) {
@@ -26,6 +27,23 @@ const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
 
 // simple per-IP rate limit: 8 submissions per 10 minutes
 let lastError = null
+// signed one-click unsubscribe links (secret derived from the API key, no extra setup)
+const SECRET = crypto.createHash('sha256').update('odp-unsub:' + KEY).digest()
+const unsubToken = (email) => crypto.createHmac('sha256', SECRET).update(email.toLowerCase()).digest('hex').slice(0, 32)
+const unsubUrl = (base, email) => `${base}/api/unsubscribe?e=${encodeURIComponent(email)}&t=${unsubToken(email)}`
+function page(title, msg) {
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>${esc(title)} | Ottawa Deck Pro</title></head>
+<body style="margin:0;background:#EFEBE2;font-family:Inter,Helvetica,Arial,sans-serif;color:#20252A;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:20px">
+<div style="max-width:460px;background:#fff;border-radius:22px;padding:36px 30px;text-align:center">
+<img src="/img/email/ottawa-deck-pro-logo-email.png" width="64" height="64" alt="Ottawa Deck Pro">
+<h1 style="font-size:26px;margin:18px 0 10px">${esc(title)}</h1><p style="font-size:15px;line-height:1.6;color:#5a5f5c;margin:0 0 22px">${msg}</p>
+<a href="/" style="display:inline-block;background:#7CBC42;color:#121614;font-weight:700;text-decoration:none;padding:12px 22px;border-radius:999px">Back to ottawadeckpro.ca</a></div></body></html>`
+}
+async function unsubscribe(email) {
+  const r = await fetch(`${BREVO}/contacts/${encodeURIComponent(email)}`, { method: 'PUT', headers: { 'api-key': KEY, 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify({ emailBlacklisted: true, ...(LIST_ID ? { unlinkListIds: [LIST_ID] } : {}) }) })
+  if (!r.ok && r.status !== 404) throw new Error(`Brevo unsubscribe ${r.status}: ${(await r.text()).slice(0, 200)}`)
+  console.log('unsubscribed')
+}
 const hits = new Map()
 function limited(ip) {
   const now = Date.now(), list = (hits.get(ip) || []).filter((t) => now - t < 600000)
@@ -148,7 +166,7 @@ async function lead(fd, ip, base) {
   return { status: 200 }
 }
 
-async function subscribe(fd, ip) {
+async function subscribe(fd, ip, base = SITE) {
   const email = clean(fd.get('email'), 200), first = clean(fd.get('first_name'), 80)
   if (!isEmail(email)) return { status: 400, error: 'Enter a valid email address.' }
   if (clean(fd.get('consent'), 10) !== 'yes') return { status: 400, error: 'Please tick the box to agree to receive our emails.' }
@@ -161,7 +179,8 @@ async function subscribe(fd, ip) {
     subject: 'Your $5,000 backyard makeover offer is saved',
     htmlContent: shell(`You're on the list${first ? ', ' + esc(first) : ''}.`, `<p style="font-size:15px;line-height:1.6;margin:0 0 12px">Your <b>$5,000 off</b> offer is saved to this email address. Mention it when you book your consultation and we'll apply it to your project.</p>
 <p style="font-size:13px;line-height:1.6;color:#6b6f6c;margin:0 0 12px"><b>Offer conditions:</b> valid on new projects with a signed contract of $40,000 or more, before tax. You must join the list before your contract is signed. One offer per household and property. Applied as a credit on your final invoice. No cash value. Cannot be combined with other offers or deck packages. Available in Ottawa Deck Pro service areas only. Ottawa Deck Pro may change or end this offer at any time; offers already in a signed contract are honoured.</p>
-<p style="font-size:12px;color:#6b6f6c;margin:0">You're receiving this because you joined our list on ottawadeckpro.ca. Reply "unsubscribe" anytime.</p>${btn(SITE + '/contacts', 'Book a free consultation')}`),
+<p style="font-size:12px;color:#6b6f6c;margin:0">You're receiving this because you joined our list on ottawadeckpro.ca. <a href="${unsubUrl(base, email)}" style="color:#6b6f6c">Unsubscribe</a> anytime.</p>${btn(SITE + '/contacts', 'Book a free consultation')}`),
+    headers: { 'List-Unsubscribe': `<${unsubUrl(base, email)}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
     tags: ['offer-welcome'],
   }).catch((e) => console.error('welcome failed', e.message))
   brevo('/smtp/email', {
@@ -185,6 +204,17 @@ http.createServer(async (req, res) => {
       }
       return send(200, out)
     }
+    if (route === '/api/unsubscribe') {
+      const u = new URL(req.url, 'http://x'), email = clean(u.searchParams.get('e'), 200), t = clean(u.searchParams.get('t'), 64)
+      const html = (code, title, msg) => { res.writeHead(code, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }); res.end(page(title, msg)) }
+      const valid = KEY && isEmail(email) && t.length === 32 && crypto.timingSafeEqual(Buffer.from(t), Buffer.from(unsubToken(email)))
+      if (!valid) return html(400, 'Link not valid', `This unsubscribe link looks incomplete. Email <a href="mailto:hello@ottawadeckpro.ca">hello@ottawadeckpro.ca</a> and we'll remove you right away.`)
+      if (req.method === 'POST') {
+        try { await unsubscribe(email) } catch (e) { console.error(e.message); return html(500, 'Something went wrong', `Please email <a href="mailto:hello@ottawadeckpro.ca">hello@ottawadeckpro.ca</a> and we'll remove you right away.`) }
+        return html(200, "You're unsubscribed", `${esc(email)} won't receive any more offers from Ottawa Deck Pro.`)
+      }
+      return html(200, 'Unsubscribe?', `Stop receiving offers and updates at ${esc(email)}.</p><form method="post" style="margin:0 0 14px"><button type="submit" style="background:#20252A;color:#fff;border:0;font-weight:700;font-size:15px;padding:13px 24px;border-radius:999px;cursor:pointer">Unsubscribe me</button></form><p style="margin:0">`)
+    }
     if (req.method !== 'POST' || !['/api/lead', '/api/subscribe'].includes(route)) return send(404, { ok: false })
     const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim()
     if (limited(ip)) return send(429, { ok: false, error: 'Too many submissions. Please call ' + PHONE + '.' })
@@ -193,7 +223,7 @@ http.createServer(async (req, res) => {
     if (!KEY) { console.error('BREVO_API_KEY not set'); return send(503, { ok: false, error: 'Form temporarily unavailable. Please call ' + PHONE + '.' }) }
     const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim()
     const base = /^(www\.)?ottawadeckpro\.ca$|\.up\.railway\.app$/.test(host) ? 'https://' + host : SITE
-    const out = route === '/api/lead' ? await lead(fd, ip, base) : await subscribe(fd, ip)
+    const out = route === '/api/lead' ? await lead(fd, ip, base) : await subscribe(fd, ip, base)
     send(out.status, out.status === 200 ? { ok: true } : { ok: false, error: out.error })
   } catch (e) {
     console.error('form error', e.message); lastError = { at: new Date().toISOString(), msg: String(e.message).replace(/xkeysib-[\w-]+/g, '[key]').slice(0, 300) }
