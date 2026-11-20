@@ -6,6 +6,10 @@
 :{$PORT:8080} {
 	root * /srv
 
+	# bare domain → www (the version Google indexes)
+	@apex host ottawadeckpro.ca
+	redir @apex https://www.ottawadeckpro.ca{uri} 301
+
 	# form handler (server/api.mjs)
 	handle /api/* {
 		request_body {
