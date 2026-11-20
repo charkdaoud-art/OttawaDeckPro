@@ -68,3 +68,10 @@ Goal: replace the Wix site on www.ottawadeckpro.ca without losing 7 months of ra
 - Railway custom domain: add **www.ottawadeckpro.ca** only (the canonical). GoDaddy can't CNAME the root.
 - GoDaddy DNS: edit the existing `www` record → CNAME to the `xxxx.up.railway.app` target Railway shows. Add TXT `_railway-verify.www` with Railway's value. Remove any old www A record. Do not touch MX / SPF / DKIM / other TXT.
 - Root domain: GoDaddy Forwarding, ottawadeckpro.ca → https://www.ottawadeckpro.ca, Permanent (301), "forward only". Then check https://ottawadeckpro.ca redirects with no certificate warning. If it fails, move nameservers to Cloudflare (free) and copy every record across first.
+
+## Forms: Brevo (replaces Formspree)
+- server/api.mjs runs inside the same Railway container; Caddy proxies /api/lead and /api/subscribe to it.
+- Railway Variables: BREVO_API_KEY (required), BREVO_LIST_ID (the "Website $5,000 offer" list), optional LEAD_TO (comma-separated, default hello@ottawadeckpro.ca), MAIL_FROM.
+- Check it at /api/health → {"ok":true,"brevo":true,"list":true}.
+- Brevo: authenticate ottawadeckpro.ca (DKIM/DMARC records in GoDaddy) so mail doesn't land in spam.
+- Lead email: branded, reply-to is the customer, photos attached (15MB cap). Customer gets an auto-reply. Signups go to the Brevo list + welcome email with the offer conditions + a notice to you.

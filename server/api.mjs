@@ -1,0 +1,138 @@
+// Ottawa Deck Pro form handler: estimate leads + $5,000 email list, sent through Brevo.
+// Env: BREVO_API_KEY (required), BREVO_LIST_ID, LEAD_TO, MAIL_FROM, API_PORT
+import http from 'node:http'
+
+const KEY = process.env.BREVO_API_KEY || ''
+const LIST_ID = Number(process.env.BREVO_LIST_ID || 0)
+const LEAD_TO = (process.env.LEAD_TO || 'hello@ottawadeckpro.ca').split(',').map((s) => s.trim()).filter(Boolean)
+const FROM = { name: 'Ottawa Deck Pro', email: process.env.MAIL_FROM || 'hello@ottawadeckpro.ca' }
+const BREVO = process.env.BREVO_BASE || 'https://api.brevo.com/v3'
+const PORT = Number(process.env.API_PORT || 3001)
+const MAX_BODY = 25 * 1024 * 1024
+const MAX_ATTACH = 15 * 1024 * 1024
+const PHONE = '613-639-1744'
+const SITE = 'https://www.ottawadeckpro.ca'
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
+const clean = (s, n = 2000) => String(s ?? '').trim().slice(0, n)
+const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
+
+// simple per-IP rate limit: 8 submissions per 10 minutes
+const hits = new Map()
+function limited(ip) {
+  const now = Date.now(), list = (hits.get(ip) || []).filter((t) => now - t < 600000)
+  list.push(now); hits.set(ip, list)
+  if (hits.size > 5000) hits.clear()
+  return list.length > 8
+}
+
+async function brevo(path, body) {
+  const r = await fetch(BREVO + path, { method: 'POST', headers: { 'api-key': KEY, 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify(body) })
+  if (!r.ok && !(path === '/contacts' && r.status === 204)) throw new Error(`Brevo ${path} ${r.status}: ${(await r.text()).slice(0, 300)}`)
+}
+
+function shell(title, inner) {
+  return `<!DOCTYPE html><html><body style="margin:0;background:#F4F1EA;font-family:Inter,Helvetica,Arial,sans-serif;color:#20252A">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F4F1EA;padding:24px 12px"><tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:18px;overflow:hidden">
+<tr><td style="background:#121614;padding:22px 28px;color:#F4F1EA">
+<div style="font-size:16px;font-weight:800;letter-spacing:.14em">OTTAWA DECK PRO</div>
+<div style="font-size:10px;letter-spacing:.3em;color:#9fa39f;margin-top:4px">OUTDOOR LIVING. ELEVATED.</div></td></tr>
+<tr><td style="padding:28px">
+<div style="font-size:24px;font-weight:800;line-height:1.2;margin-bottom:14px">${title}</div>
+${inner}
+</td></tr>
+<tr><td style="padding:18px 28px;background:#F4F1EA;font-size:12px;color:#6b6f6c;line-height:1.6">
+Ottawa Deck Pro · 6930 Fallowfield Road, Ottawa, ON · ${PHONE} · <a href="${SITE}" style="color:#4f7d2a">ottawadeckpro.ca</a></td></tr>
+</table></td></tr></table></body></html>`
+}
+const rows = (pairs) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:14px">${pairs
+  .filter(([, v]) => v)
+  .map(([k, v]) => `<tr><td style="padding:9px 12px 9px 0;border-bottom:1px solid #eee;color:#6b6f6c;width:150px;vertical-align:top">${esc(k)}</td><td style="padding:9px 0;border-bottom:1px solid #eee;font-weight:600">${esc(v).replace(/\n/g, '<br>')}</td></tr>`)
+  .join('')}</table>`
+const btn = (href, label) => `<a href="${href}" style="display:inline-block;background:#7CBC42;color:#121614;font-weight:700;text-decoration:none;padding:12px 22px;border-radius:999px;margin-top:20px">${label}</a>`
+
+async function readForm(req) {
+  const len = Number(req.headers['content-length'] || 0)
+  if (len > MAX_BODY) throw Object.assign(new Error('too large'), { status: 413 })
+  const request = new Request('http://local' + req.url, { method: 'POST', headers: req.headers, body: req, duplex: 'half' })
+  return request.formData()
+}
+
+async function lead(fd, ip) {
+  const f = (k, n) => clean(fd.get(k), n)
+  const name = f('name', 120), email = f('email', 200), phone = f('phone', 40), area = f('area', 120), service = f('service', 80)
+  if (!name || !isEmail(email) || phone.replace(/\D/g, '').length < 10 || !area || !service) return { status: 400, error: 'Please fill in the required fields.' }
+  let selections = ''
+  try { const s = JSON.parse(f('selections', 4000) || 'null'); if (s && typeof s === 'object') selections = Object.entries(s).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join('\n') } catch { selections = f('selections', 4000) }
+  const attachment = []; let total = 0, skipped = 0
+  for (const key of ['photos', 'documents']) for (const file of fd.getAll(key)) {
+    if (!file || typeof file === 'string' || !file.size) continue
+    if (total + file.size > MAX_ATTACH) { skipped++; continue }
+    total += file.size
+    attachment.push({ name: clean(file.name, 120).replace(/[^\w.\- ]/g, '_') || 'file', content: Buffer.from(await file.arrayBuffer()).toString('base64') })
+  }
+  const pairs = [['Name', name], ['Email', email], ['Phone', phone], ['Location', area], ['Service', service], ['Size', f('size', 120)], ['Material', f('material', 120)], ['Timeline', f('timeline', 120)], ['Budget', f('budget', 120)], ['Selections', selections], ['Message', f('message', 4000)], ['Files', attachment.length ? `${attachment.length} attached` + (skipped ? `, ${skipped} too large to attach` : '') : skipped ? `${skipped} too large to attach` : ''], ['Page', f('page', 200)]]
+  await brevo('/smtp/email', {
+    sender: FROM, to: LEAD_TO.map((email) => ({ email })), replyTo: { email, name },
+    subject: `New estimate request: ${name}, ${service}, ${area}`,
+    htmlContent: shell('New estimate request', `<p style="margin:0 0 16px;font-size:15px;color:#4a4f4c">Reply to this email to answer ${esc(name)} directly.</p>${rows(pairs)}${btn(`tel:${phone.replace(/[^\d+]/g, '')}`, `Call ${esc(name.split(' ')[0])}`)}`),
+    ...(attachment.length ? { attachment } : {}),
+    tags: ['website-lead'],
+  })
+  // confirmation to the customer (a failure here never loses the lead)
+  brevo('/smtp/email', {
+    sender: FROM, to: [{ email, name }], replyTo: { email: LEAD_TO[0], name: 'Ottawa Deck Pro' },
+    subject: 'We received your project details',
+    htmlContent: shell(`Thanks, ${esc(name.split(' ')[0])}.`, `<p style="font-size:15px;line-height:1.6;margin:0 0 12px">We received your ${esc(service.toLowerCase())} request for ${esc(area)}. Someone from our team will get back to you within 1 business day to talk through your ideas and book a free on-site consultation.</p>
+<p style="font-size:15px;line-height:1.6;margin:0">Have photos, drawings or a deadline to share? Just reply to this email, or call or text us at ${PHONE}.</p>${btn(SITE + '/gallery', 'See our recent projects')}`),
+    tags: ['lead-confirmation'],
+  }).catch((e) => console.error('confirmation failed', e.message))
+  console.log('lead sent', ip, service, area)
+  return { status: 200 }
+}
+
+async function subscribe(fd, ip) {
+  const email = clean(fd.get('email'), 200), first = clean(fd.get('first_name'), 80)
+  if (!isEmail(email)) return { status: 400, error: 'Enter a valid email address.' }
+  if (clean(fd.get('consent'), 10) !== 'yes') return { status: 400, error: 'Please tick the box to agree to receive our emails.' }
+  const consent = `${clean(fd.get('consent_text'), 400)} | at ${clean(fd.get('consent_at'), 40) || new Date().toISOString()} | ip ${ip} | ${clean(fd.get('source'), 40)} ${clean(fd.get('page'), 200)}`
+  if (LIST_ID) {
+    await brevo('/contacts', { email, updateEnabled: true, listIds: [LIST_ID], attributes: { ...(first ? { FIRSTNAME: first } : {}) } })
+  }
+  brevo('/smtp/email', {
+    sender: FROM, to: [{ email, ...(first ? { name: first } : {}) }],
+    subject: 'Your $5,000 backyard makeover offer is saved',
+    htmlContent: shell(`You're on the list${first ? ', ' + esc(first) : ''}.`, `<p style="font-size:15px;line-height:1.6;margin:0 0 12px">Your <b>$5,000 off</b> offer is saved to this email address. Mention it when you book your consultation and we'll apply it to your project.</p>
+<p style="font-size:13px;line-height:1.6;color:#6b6f6c;margin:0 0 12px"><b>Offer conditions:</b> valid on new projects with a signed contract of $40,000 or more, before tax. You must join the list before your contract is signed. One offer per household and property. Applied as a credit on your final invoice. No cash value. Cannot be combined with other offers or deck packages. Available in Ottawa Deck Pro service areas only. Ottawa Deck Pro may change or end this offer at any time; offers already in a signed contract are honoured.</p>
+<p style="font-size:12px;color:#6b6f6c;margin:0">You're receiving this because you joined our list on ottawadeckpro.ca. Reply "unsubscribe" anytime.</p>${btn(SITE + '/contacts', 'Book a free consultation')}`),
+    tags: ['offer-welcome'],
+  }).catch((e) => console.error('welcome failed', e.message))
+  brevo('/smtp/email', {
+    sender: FROM, to: LEAD_TO.map((e) => ({ email: e })), replyTo: { email },
+    subject: `New $5,000 offer signup: ${first || email}`,
+    htmlContent: shell('New email list signup', rows([['Name', first], ['Email', email], ['Consent', consent]])),
+    tags: ['offer-signup'],
+  }).catch((e) => console.error('signup notice failed', e.message))
+  console.log('signup', ip)
+  return { status: 200 }
+}
+
+http.createServer(async (req, res) => {
+  const send = (status, obj) => { res.writeHead(status, { 'content-type': 'application/json', 'cache-control': 'no-store' }); res.end(JSON.stringify(obj)) }
+  try {
+    const route = req.url.split('?')[0]
+    if (req.method === 'GET' && route === '/api/health') return send(200, { ok: true, brevo: !!KEY, list: !!LIST_ID })
+    if (req.method !== 'POST' || !['/api/lead', '/api/subscribe'].includes(route)) return send(404, { ok: false })
+    const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim()
+    if (limited(ip)) return send(429, { ok: false, error: 'Too many submissions. Please call ' + PHONE + '.' })
+    const fd = await readForm(req)
+    if (clean(fd.get('company_website'))) return send(200, { ok: true }) // honeypot: pretend success
+    if (!KEY) { console.error('BREVO_API_KEY not set'); return send(503, { ok: false, error: 'Form temporarily unavailable. Please call ' + PHONE + '.' }) }
+    const out = route === '/api/lead' ? await lead(fd, ip) : await subscribe(fd, ip)
+    send(out.status, out.status === 200 ? { ok: true } : { ok: false, error: out.error })
+  } catch (e) {
+    console.error('form error', e.message)
+    send(e.status || 500, { ok: false, error: 'Something went wrong. Please call ' + PHONE + '.' })
+  }
+}).listen(PORT, '127.0.0.1', () => console.log('form api on', PORT))

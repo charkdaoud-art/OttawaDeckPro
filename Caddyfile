@@ -5,6 +5,14 @@
 
 :{$PORT:8080} {
 	root * /srv
+
+	# form handler (server/api.mjs)
+	handle /api/* {
+		request_body {
+			max_size 25MB
+		}
+		reverse_proxy 127.0.0.1:3001
+	}
 	encode zstd gzip
 
 	# old Wix duplicate page

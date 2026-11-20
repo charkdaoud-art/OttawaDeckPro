@@ -298,8 +298,8 @@
       if (!form.consent.checked) { err.textContent = 'Please tick the box to agree to receive our emails.'; return }
       if (form.company_website && form.company_website.value) return
       err.textContent = ''
-      store.set('joined')
       var done = function (sent) {
+        if (sent) store.set('joined')
         form.innerHTML = '<div class="py-4"><p class="font-display text-[24px] font-bold">You&rsquo;re on the list.</p><p class="mt-1 text-[14px] opacity-70">' +
           (sent ? 'Your $5,000 offer is saved to your email. Mention it when you book your consultation.' : 'Preview site: nothing was sent. On the live site this adds you to the Ottawa Deck Pro list.') + '</p></div>'
         if (sent && window.gtag) gtag('event', 'sign_up', { method: 'offer_5000', form_id: form.getAttribute('data-list') })
@@ -307,7 +307,7 @@
       }
       if (!LIST) return done(false)
       var data = new FormData(form); data.append('source', form.getAttribute('data-list')); data.append('_subject', 'New $5,000 offer signup'); data.append('page', location.pathname); data.append('consent_text', form.querySelector('label span').textContent); data.append('consent_at', new Date().toISOString())
-      fetch(LIST, { method: 'POST', body: data, headers: { Accept: 'application/json' } }).then(function (r) { done(r.ok) }).catch(function () { err.textContent = 'Something went wrong. Please try again.' })
+      fetch(LIST, { method: 'POST', body: data, headers: { Accept: 'application/json' } }).then(function (r) { if (r.ok) return done(true); return r.json().catch(function () { return {} }).then(function (j) { store.set('seen'); err.textContent = j.error || 'Something went wrong. Please try again.' }) }).catch(function () { err.textContent = 'Something went wrong. Please try again.' })
     })
   })
 })()

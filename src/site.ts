@@ -21,8 +21,8 @@ export const BRAND = {
 }
 
 // Tracking IDs found on the live site (kept for production; not loaded in the preview).
-// Paste form endpoints here before launch (e.g. a Formspree form URL). Empty = forms validate but send nothing.
-export const FORMS = { estimate: 'https://formspree.io/f/xgakzgww', emailList: 'https://formspree.io/f/xkjrzdwg' }
+// Form endpoints. Empty = forms validate but send nothing.
+export const FORMS = { estimate: '/api/lead', emailList: '/api/subscribe' } // handled by server/api.mjs (Brevo)
 export const TRACKING = { ga4: 'G-ZSY1FWD658', googleAds: 'AW-17039643222', metaPixel: '1187448019933365', gscVerification: 'WA3t71gzjW5ACyZbgLwVrLcvtUcoyK0A_ivaud61yYg' }
 
 export const STATS = [
