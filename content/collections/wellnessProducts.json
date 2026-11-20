@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "slug": "example-sauna",
+      "published": false,
+      "name": "Example: 4-person glass-front sauna",
+      "category": "Outdoor Saunas",
+      "images": [],
+      "dimensions": "",
+      "capacity": "",
+      "materials": "",
+      "heaterOptions": [],
+      "electrical": "",
+      "finishes": [],
+      "smartFeatures": [],
+      "upgrades": [],
+      "installation": "",
+      "price": "",
+      "faqs": []
+    }
+  ]
+}

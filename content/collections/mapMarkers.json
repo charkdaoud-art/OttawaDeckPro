@@ -1,0 +1,43 @@
+{
+  "items": [
+    {
+      "id": "review-manotick",
+      "type": "review",
+      "division": "residential",
+      "category": "residential",
+      "area": "Manotick",
+      "x": 56,
+      "y": 84,
+      "title": "Client review, Manotick",
+      "description": "“Very happy we chose Ottawa Deck Pros. The deck feels sturdy, looks great…” Jaclyn Epel",
+      "image": null,
+      "link": "https://www.google.com/maps/contrib/105210104605609955778/reviews?hl=en"
+    },
+    {
+      "id": "review-stittsville",
+      "type": "review",
+      "division": "residential",
+      "category": "residential",
+      "area": "Stittsville",
+      "x": 32,
+      "y": 56,
+      "title": "Client review, Stittsville",
+      "description": "“They demolished my old deck and built a brand-new one that looks amazing.” Erika Clarke",
+      "image": null,
+      "link": "https://www.google.com/maps/contrib/106555921287249128002/reviews?hl=en"
+    },
+    {
+      "id": "review-kanata",
+      "type": "review",
+      "division": "residential",
+      "category": "residential",
+      "area": "Kanata",
+      "x": 38,
+      "y": 44,
+      "title": "Client review, Kanata",
+      "description": "“They removed our old deck and replaced it with something that looks modern, clean, and very well built.” Elliott Hardy",
+      "image": null,
+      "link": "https://www.google.com/maps/contrib/100399811199163204124/reviews?hl=en"
+    }
+  ]
+}

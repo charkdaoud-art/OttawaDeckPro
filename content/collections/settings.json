@@ -1,0 +1,31 @@
+{
+  "tagline": "OUTDOOR LIVING. ELEVATED.",
+  "statement": "From luxury residential backyards to large-scale commercial projects and private wellness retreats, Ottawa Deck Pro is redefining outdoor construction.",
+  "verifiedStats": [
+    {
+      "value": "1M+",
+      "label": "Views",
+      "detail": "Total views across our social channels.",
+      "source": "Owner-provided, Nov 6 2026"
+    },
+    {
+      "value": "10+",
+      "label": "decks",
+      "detail": "Condominium and multi-unit projects completed in 2026.",
+      "source": "Owner-provided, Nov 2026"
+    }
+  ],
+  "social": {
+    "instagram": "https://www.instagram.com/ottawadeckpro/",
+    "facebook": "https://www.facebook.com/ottawadeckpro/"
+  },
+  "commercialFact": "Ottawa Deck Pro completed commercial work during 2026, including condominium and multi-unit projects involving 10 or more decks.",
+  "heroVideo": "",
+  "heroVideoNote": "Optional: path to a short muted MP4 (e.g. /img/uploads/hero.mp4). Leave blank to use the photo.",
+  "googleReviewsUrl": "https://share.google/m55sUI2ayx2egtgOq",
+  "googleRating": {
+    "value": "5.0",
+    "count": "77",
+    "source": "Google listing, checked Nov 6 2026"
+  }
+}

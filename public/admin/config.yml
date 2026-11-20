@@ -1,0 +1,187 @@
+# Decap CMS: edit site content from any browser or phone. Saving commits to the repo and triggers a rebuild.
+# backend: GitHub (or git-gateway on Netlify). Set repo/branch once the site repository exists.
+backend:
+  name: github
+  repo: charkdaoud-art/OttawaDeckPro
+  branch: main
+media_folder: public/img/uploads
+public_folder: uploads   # image src values are relative to /img/
+publish_mode: simple
+
+_image: &image
+  - { label: Image, name: src, widget: image }
+  - { label: Alt text, name: alt, widget: string }
+  - { label: Caption, name: caption, widget: string, required: false }
+  - { label: Category, name: category, widget: select, options: [composite, wood, railings, structures, fences, multi-unit, wellness, residential], required: false }
+  - { label: Location (general area only), name: location, widget: string, required: false }
+  - { label: Before/after, name: beforeAfter, widget: select, options: [none, before, after], default: none }
+  - { label: Image source, name: source, widget: select, options: [{ label: Actual project, value: actual }, { label: Concept rendering, value: concept }], default: actual }
+
+collections:
+  - name: content
+    label: Site content
+    files:
+      - label: Jobsite updates (phone-friendly)
+        name: updates
+        file: content/collections/updates.json
+        fields:
+          - label: Updates
+            name: items
+            widget: list
+            summary: "{{fields.date}} · {{fields.status}} · {{fields.caption}}"
+            fields:
+              - { label: Photo, name: image, widget: image }
+              - { label: Caption, name: caption, widget: string }
+              - { label: Category, name: category, widget: select, options: [Residential, Commercial, Wellness] }
+              - { label: Neighbourhood (approximate), name: area, widget: string }
+              - { label: Status, name: status, widget: select, options: [PROJECT STARTED, FRAMING UNDERWAY, DECKING INSTALLATION, RAILINGS IN PROGRESS, FINAL DETAILS, PROJECT COMPLETED] }
+              - { label: Publication date, name: date, widget: datetime, date_format: YYYY-MM-DD, time_format: false, format: YYYY-MM-DD }
+              - { label: Project page link, name: link, widget: string, required: false }
+      - label: Instagram & Facebook Reels
+        name: reels
+        file: content/collections/reels.json
+        fields:
+          - label: Reels
+            name: items
+            widget: list
+            fields:
+              - { label: Platform, name: platform, widget: select, options: [instagram, facebook] }
+              - { label: Reel URL, name: url, widget: string }
+              - { label: Thumbnail, name: thumbnail, widget: image }
+              - { label: Short description, name: description, widget: string }
+              - { label: Location, name: location, widget: string, required: false }
+              - { label: View count (e.g. 300K), name: views, widget: string, required: false }
+              - { label: View count verified, name: viewsVerified, widget: boolean, default: false }
+      - label: Projects (residential, commercial, wellness)
+        name: projects
+        file: content/collections/projects.json
+        fields:
+          - label: Projects
+            name: items
+            widget: list
+            summary: "{{fields.division}} · {{fields.title}}"
+            fields:
+              - { label: ID, name: id, widget: string }
+              - { label: Title, name: title, widget: string }
+              - { label: Division, name: division, widget: select, options: [residential, commercial, wellness] }
+              - { label: Category, name: category, widget: string }
+              - { label: Location (general area only), name: location, widget: string, required: false }
+              - { label: Description, name: description, widget: text }
+              - { label: Image, name: image, widget: object, fields: *image }
+              - { label: Featured on homepage, name: featured, widget: boolean, default: false }
+      - label: Commercial photos (actual) and concept renderings
+        name: commercialConcepts
+        file: content/collections/commercialConcepts.json
+        fields: [{ label: Images, name: items, widget: list, fields: *image }]
+      - label: Before & after
+        name: beforeAfter
+        file: content/collections/beforeAfter.json
+        fields:
+          - label: Pairs
+            name: items
+            widget: list
+            fields:
+              - { label: ID, name: id, widget: string }
+              - { label: Category, name: category, widget: select, options: [residential, commercial, covered, wellness] }
+              - { label: Title, name: title, widget: string }
+              - { label: Location, name: location, widget: string, required: false }
+              - { label: Before, name: before, widget: object, fields: *image }
+              - { label: After, name: after, widget: object, fields: *image }
+      - label: Map markers
+        name: mapMarkers
+        file: content/collections/mapMarkers.json
+        fields:
+          - label: Markers
+            name: items
+            widget: list
+            fields:
+              - { label: ID, name: id, widget: string }
+              - { label: Type, name: type, widget: select, options: [project, review] }
+              - { label: Division, name: division, widget: select, options: [residential, commercial, wellness] }
+              - { label: Category, name: category, widget: select, options: [residential, commercial, composite, wood, railings, wellness] }
+              - { label: Area (no exact addresses), name: area, widget: string }
+              - { label: Map X (0-100), name: x, widget: number }
+              - { label: Map Y (0-100), name: y, widget: number }
+              - { label: Title, name: title, widget: string }
+              - { label: Description, name: description, widget: text }
+              - { label: Image, name: image, widget: object, required: false, fields: *image }
+              - { label: Link, name: link, widget: string, required: false }
+      - label: Team
+        name: team
+        file: content/collections/team.json
+        fields:
+          - label: Members
+            name: items
+            widget: list
+            fields:
+              - { label: Name, name: name, widget: string }
+              - { label: Role, name: role, widget: string }
+              - { label: Group, name: group, widget: select, options: [Leadership, Project coordination, Construction crews, Customer service] }
+              - { label: Short bio, name: bio, widget: text, required: false }
+              - { label: Photo, name: photo, widget: object, required: false, fields: *image }
+      - label: Wellness products
+        name: wellnessProducts
+        file: content/collections/wellnessProducts.json
+        fields:
+          - label: Products
+            name: items
+            widget: list
+            fields:
+              - { label: Slug, name: slug, widget: string }
+              - { label: Published, name: published, widget: boolean, default: false }
+              - { label: Name, name: name, widget: string }
+              - { label: Category, name: category, widget: select, options: [Outdoor Saunas, Cold Plunges, Sauna + Plunge Packages, Custom Wellness Spaces] }
+              - { label: Images, name: images, widget: list, fields: *image }
+              - { label: Dimensions, name: dimensions, widget: string, required: false }
+              - { label: Capacity, name: capacity, widget: string, required: false }
+              - { label: Materials, name: materials, widget: string, required: false }
+              - { label: Heater options, name: heaterOptions, widget: list, required: false }
+              - { label: Electrical requirements, name: electrical, widget: string, required: false }
+              - { label: Finishes, name: finishes, widget: list, required: false }
+              - { label: Smart features (manufacturer-supported only), name: smartFeatures, widget: list, required: false }
+              - { label: Optional upgrades, name: upgrades, widget: list, required: false }
+              - { label: Installation details, name: installation, widget: text, required: false }
+              - { label: Price (CAD, blank = quote on request), name: price, widget: string, required: false }
+              - { label: FAQs, name: faqs, widget: list, required: false, fields: [{ label: Question, name: q, widget: string }, { label: Answer, name: a, widget: text }] }
+      - label: Google reviews (paste real reviews only)
+        name: reviews
+        file: content/collections/reviews.json
+        fields:
+          - label: Reviews
+            name: items
+            widget: list
+            summary: "{{fields.name}} · {{fields.area}}"
+            fields:
+              - { label: Reviewer name (as shown on Google), name: name, widget: string }
+              - { label: Area, name: area, widget: string, required: false }
+              - { label: Review text (exact), name: quote, widget: text }
+              - { label: Link to the review, name: href, widget: string }
+              - { label: Source, name: source, widget: select, options: [Google, Facebook, HomeStars], default: Google }
+      - label: FAQ library
+        name: faqs
+        file: content/collections/faqs.json
+        fields:
+          - label: Questions
+            name: items
+            widget: list
+            summary: "{{fields.cat}} · {{fields.q}}"
+            fields:
+              - { label: ID (URL anchor), name: id, widget: string }
+              - { label: Category, name: cat, widget: select, options: [cost, materials, lifespan, permits, design, railings, hottub, climate, repair, fences, process, commercial, wellness] }
+              - { label: Topic tags (decide which pages show it), name: tags, widget: list }
+              - { label: Question, name: q, widget: string }
+              - { label: Answer, name: a, widget: text }
+              - { label: Link (path, label), name: link, widget: list, required: false }
+      - label: Settings & verified stats
+        name: settings
+        file: content/collections/settings.json
+        fields:
+          - { label: Tagline, name: tagline, widget: string }
+          - { label: Homepage hero video (short muted MP4, optional), name: heroVideo, widget: file, required: false }
+          - { label: Statement, name: statement, widget: text }
+          - { label: Commercial fact, name: commercialFact, widget: text }
+          - label: Verified stats
+            name: verifiedStats
+            widget: list
+            fields: [{ label: Value, name: value, widget: string }, { label: Label, name: label, widget: string }, { label: Detail, name: detail, widget: string }, { label: Source / verified by, name: source, widget: string }]
+          - { label: Social, name: social, widget: object, fields: [{ label: Instagram, name: instagram, widget: string }, { label: Facebook, name: facebook, widget: string }] }

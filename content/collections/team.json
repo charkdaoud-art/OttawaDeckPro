@@ -1,0 +1,32 @@
+{
+  "items": [
+    {
+      "name": "",
+      "role": "Leadership",
+      "group": "Leadership",
+      "bio": "",
+      "photo": null
+    },
+    {
+      "name": "",
+      "role": "Project coordination",
+      "group": "Project coordination",
+      "bio": "",
+      "photo": null
+    },
+    {
+      "name": "",
+      "role": "Construction crew",
+      "group": "Construction crews",
+      "bio": "",
+      "photo": null
+    },
+    {
+      "name": "",
+      "role": "Customer service",
+      "group": "Customer service",
+      "bio": "",
+      "photo": null
+    }
+  ]
+}

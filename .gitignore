@@ -1,0 +1,7 @@
+node_modules/
+dist/
+preview/
+*.zip
+*.whl
+.DS_Store
+.env*

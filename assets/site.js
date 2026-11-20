@@ -1,0 +1,302 @@
+/* Ottawa Deck Pro: progressive enhancement only. Every page works without this file. */
+(function () {
+  var d = document, root = d.documentElement
+  root.classList.add('js')
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  // header: solid after scrolling past the hero; mobile estimate bar after the first screen
+  var header = d.querySelector('[data-header]'), bar = d.querySelector('[data-mobile-bar]')
+  function onScroll() {
+    var y = window.scrollY
+    if (header) header.classList.toggle('is-solid', y > 40)
+    if (bar) bar.classList.toggle('show', y > window.innerHeight * 0.6)
+  }
+  onScroll(); addEventListener('scroll', onScroll, { passive: true })
+
+  // mobile menu
+  var menu = d.querySelector('[data-menu]'), openBtn = d.querySelector('[data-menu-open]')
+  function setMenu(open) {
+    if (!menu) return
+    menu.hidden = !open; openBtn && openBtn.setAttribute('aria-expanded', String(open))
+    d.body.style.overflow = open ? 'hidden' : ''
+    if (open) { var f = menu.querySelector('button, a'); f && f.focus() } else openBtn && openBtn.focus()
+  }
+  openBtn && openBtn.addEventListener('click', function () { setMenu(true) })
+  d.querySelectorAll('[data-menu-close]').forEach(function (b) { b.addEventListener('click', function () { setMenu(false) }) })
+  addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu && !menu.hidden) setMenu(false) })
+
+  // reveal on scroll
+  var els = d.querySelectorAll('.reveal')
+  if (reduce || !('IntersectionObserver' in window)) els.forEach(function (e) { e.classList.add('in') })
+  else {
+    var io = new IntersectionObserver(function (entries) { entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target) } }) }, { rootMargin: '0px 0px -8% 0px' })
+    els.forEach(function (e) { io.observe(e) })
+  }
+
+  // before / after sliders
+  d.querySelectorAll('[data-ba]').forEach(function (el) {
+    var r = el.querySelector('input[type=range]')
+    r && r.addEventListener('input', function () { el.style.setProperty('--pos', r.value + '%') })
+  })
+
+  // gallery filters + lightbox with keyboard and swipe
+  var grid = d.querySelector('[data-gallery]')
+  if (grid) {
+    var items = Array.prototype.slice.call(grid.querySelectorAll('.m-item'))
+    d.querySelectorAll('[data-filter]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var f = btn.getAttribute('data-filter')
+        d.querySelectorAll('[data-filter]').forEach(function (b) { var on = b === btn; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', String(on)) })
+        items.forEach(function (it) { it.classList.toggle('hide', f !== 'all' && it.getAttribute('data-cats').split(' ').indexOf(f) < 0) })
+      })
+    })
+    var lb = d.querySelector('[data-lightbox]'), img = lb.querySelector('[data-lb-img]'), cap = lb.querySelector('[data-lb-cap]'), cur = 0, last = null
+    function visible() { return items.filter(function (i) { return !i.classList.contains('hide') }) }
+    function show(i) { var v = visible(); cur = (i + v.length) % v.length; var it = v[cur]; img.src = it.getAttribute('data-full'); img.alt = it.getAttribute('data-alt'); cap.textContent = it.getAttribute('data-alt') }
+    function open(it) { last = it; lb.hidden = false; d.body.style.overflow = 'hidden'; show(visible().indexOf(it)); lb.querySelector('[data-lb-close]').focus() }
+    function close() { lb.hidden = true; d.body.style.overflow = ''; last && last.focus() }
+    items.forEach(function (it) { it.addEventListener('click', function () { open(it) }) })
+    lb.querySelector('[data-lb-close]').addEventListener('click', close)
+    lb.querySelector('[data-lb-prev]').addEventListener('click', function () { show(cur - 1) })
+    lb.querySelector('[data-lb-next]').addEventListener('click', function () { show(cur + 1) })
+    lb.addEventListener('click', function (e) { if (e.target === lb) close() })
+    addEventListener('keydown', function (e) { if (lb.hidden) return; if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') show(cur + 1); if (e.key === 'ArrowLeft') show(cur - 1) })
+    var sx = null
+    lb.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX }, { passive: true })
+    lb.addEventListener('touchend', function (e) { if (sx === null) return; var dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1)); sx = null })
+  }
+
+
+  /* ===== 2026 upgrade ===== */
+  // animated stats: count up numbers inside [data-count] once visible
+  if (!reduce && 'IntersectionObserver' in window) {
+    var cio = new IntersectionObserver(function (es) { es.forEach(function (en) {
+      if (!en.isIntersecting) return; cio.unobserve(en.target)
+      var el = en.target, txt = el.getAttribute('data-count'), m = txt.match(/[\d,.]+/); if (!m) return
+      var target = parseFloat(m[0].replace(/,/g, '')), pre = txt.slice(0, m.index), post = txt.slice(m.index + m[0].length), t0 = performance.now(), dur = 1400, comma = m[0].indexOf(',') >= 0
+      ;(function tick(t) { var k = Math.min(1, (t - t0) / dur), v = Math.round(target * (1 - Math.pow(1 - k, 3))); el.textContent = pre + (comma ? v.toLocaleString('en-CA') : v) + post; if (k < 1) requestAnimationFrame(tick) })(t0)
+    }) }, { threshold: 0.6 })
+    d.querySelectorAll('[data-count]').forEach(function (e) { cio.observe(e) })
+  }
+  // subtle parallax on large architectural images
+  var px = d.querySelectorAll('[data-parallax]')
+  if (px.length && !reduce) {
+    var ticking = false
+    addEventListener('scroll', function () { if (ticking) return; ticking = true; requestAnimationFrame(function () { px.forEach(function (el) { var r = el.parentElement.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return; el.style.transform = 'translate3d(0,' + (r.top * -0.12).toFixed(1) + 'px,0) scale(1.12)' }); ticking = false }) }, { passive: true })
+  }
+  // commercial split: animate residential → multi-unit when in view
+  d.querySelectorAll('[data-split]').forEach(function (el) {
+    if (reduce || !('IntersectionObserver' in window)) return
+    var on = false, timer
+    new IntersectionObserver(function (es) { es.forEach(function (en) {
+      clearInterval(timer); if (!en.isIntersecting) return
+      timer = setInterval(function () { on = !on; el.style.setProperty('--split', on ? '8%' : '92%') }, 3200); el.style.setProperty('--split', '92%')
+    }) }, { threshold: 0.4 }).observe(el)
+  })
+  // reels: drag to scroll on desktop + custom "Drag" cursor
+  d.querySelectorAll('[data-reels]').forEach(function (track) {
+    var down = false, sx = 0, sl = 0, moved = false
+    var cur = d.createElement('div'); cur.className = 'cursor-drag'; cur.textContent = 'DRAG'; d.body.appendChild(cur)
+    var fine = matchMedia('(pointer: fine)').matches
+    track.addEventListener('mouseenter', function () { if (fine && !reduce) cur.classList.add('on') })
+    track.addEventListener('mouseleave', function () { cur.classList.remove('on'); down = false })
+    track.addEventListener('mousemove', function (e) { cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px'; if (!down) return; var dx = e.pageX - sx; if (Math.abs(dx) > 4) moved = true; track.scrollLeft = sl - dx })
+    track.addEventListener('mousedown', function (e) { down = true; moved = false; sx = e.pageX; sl = track.scrollLeft; track.style.scrollSnapType = 'none' })
+    addEventListener('mouseup', function () { down = false; track.style.scrollSnapType = '' })
+    track.addEventListener('click', function (e) { if (moved) { e.preventDefault(); moved = false } }, true)
+  })
+  // map: filters + floating project card
+  var map = d.querySelector('[data-map]')
+  if (map) {
+    var card = map.querySelector('[data-map-card]'), q = function (s) { return card.querySelector(s) }
+    map.querySelectorAll('[data-marker]').forEach(function (m) {
+      m.addEventListener('click', function () {
+        q('[data-mc-title]').textContent = m.dataset.title; q('[data-mc-desc]').textContent = m.dataset.desc; q('[data-mc-area]').textContent = m.dataset.area + (m.dataset.type === 'review' ? ' · Client review' : '')
+        var im = q('[data-mc-img]'); if (m.dataset.img) { im.src = m.dataset.img; im.hidden = false } else im.hidden = true
+        var a = q('[data-mc-link]'); if (m.dataset.link) { a.href = m.dataset.link; a.textContent = m.dataset.type === 'review' ? 'Read the review' : 'View project'; a.hidden = false } else a.hidden = true
+        card.hidden = false
+      })
+    })
+    q('[data-map-close]').addEventListener('click', function () { card.hidden = true })
+    d.querySelectorAll('[data-map-filter]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var f = b.dataset.mapFilter, shown = 0
+        d.querySelectorAll('[data-map-filter]').forEach(function (x) { var on = x === b; x.classList.toggle('chip-on', on); x.setAttribute('aria-pressed', on) })
+        map.querySelectorAll('[data-marker]').forEach(function (m) { var ok = f === 'all' || m.dataset.cats.split(' ').indexOf(f) >= 0; m.classList.toggle('dim', !ok); if (ok) shown++ })
+        var empty = d.querySelector('[data-map-empty]'); if (empty) empty.hidden = shown > 0; card.hidden = true
+      })
+    })
+  }
+  // before/after category tabs
+  var baTabs = d.querySelectorAll('[data-ba-tab]')
+  baTabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      var c = t.dataset.baTab, n = 0
+      baTabs.forEach(function (x) { var on = x === t; x.classList.toggle('is-on', on); x.setAttribute('aria-selected', on) })
+      d.querySelectorAll('[data-ba-cat]').forEach(function (it) { var ok = it.dataset.baCat === c; it.hidden = !ok; if (ok) n++ })
+      var e = d.querySelector('[data-ba-empty]'); if (e) e.classList.toggle('hidden', n > 0)
+    })
+  })
+  // lead path tabs
+  function setLead(k) {
+    d.querySelectorAll('[data-lead-tab]').forEach(function (x) { var on = x.dataset.leadTab === k; x.classList.toggle('on', on); x.setAttribute('aria-selected', on) })
+    d.querySelectorAll('[data-lead-panel]').forEach(function (p) { p.hidden = p.dataset.leadPanel !== k })
+  }
+  d.querySelectorAll('[data-lead-tab]').forEach(function (t) { t.addEventListener('click', function () { setLead(t.dataset.leadTab) }) })
+  // project wizard: select → options → inspiration → estimate (selections carried into the form; no prices)
+  var wz = d.querySelector('[data-wizard]')
+  if (wz) {
+    var type = null, step = 1
+    function go(n) { step = n; wz.querySelectorAll('[data-step]').forEach(function (s) { s.hidden = +s.dataset.step !== n }); wz.querySelectorAll('[data-step-dot]').forEach(function (s) { s.classList.toggle('on', +s.dataset.stepDot <= n) }) }
+    function picks() { var out = []; wz.querySelectorAll('[data-wiz-opts="' + type + '"] fieldset').forEach(function (f) { var c = f.querySelector('input:checked'); if (c) out.push(f.querySelector('legend').textContent + ': ' + c.value) }); return out }
+    wz.querySelectorAll('[data-wiz-type]').forEach(function (b) { b.addEventListener('click', function () {
+      type = b.dataset.wizType; wz.querySelectorAll('[data-wiz-type]').forEach(function (x) { x.classList.toggle('on', x === b) })
+      wz.querySelectorAll('[data-wiz-opts]').forEach(function (o) { o.hidden = o.dataset.wizOpts !== type }); go(2)
+    }) })
+    wz.querySelectorAll('[data-wiz-back]').forEach(function (b) { b.addEventListener('click', function () { go(step - 1) }) })
+    wz.querySelectorAll('[data-wiz-next]').forEach(function (b) { b.addEventListener('click', function () {
+      if (step === 2) {
+        var mat = (picks().find(function (p) { return /^Material/.test(p) }) || '').toLowerCase(), want = type === 'residential' ? (/cedar|pressure/.test(mat) ? 'wood' : /composite|pvc/.test(mat) ? 'composite' : '') : ''
+        var pool = Array.prototype.slice.call(wz.querySelectorAll('[data-insp-pool] span')).filter(function (s) { return s.dataset.k.split(' ')[0] === type && (!want || s.dataset.k.indexOf(want) >= 0 || type !== 'residential') })
+        if (!pool.length) pool = Array.prototype.slice.call(wz.querySelectorAll('[data-insp-pool] span')).filter(function (s) { return s.dataset.k.split(' ')[0] === type })
+        wz.querySelector('[data-wiz-insp]').innerHTML = !pool.length ? '<div class="md:col-span-3 rounded-2xl bg-ivory p-8 text-[16px] leading-relaxed text-graphite/70">We\u2019ll walk you through relevant ' + (type === 'wellness' ? 'sauna and cold-plunge' : 'multi-unit') + ' work during your consultation. Continue to send us your selections.</div>' : pool.slice(0, 6).map(function (s) { return '<figure class="media relative aspect-[4/3] overflow-hidden rounded-2xl"><img src="' + s.dataset.src + '" alt="' + s.dataset.alt.replace(/"/g, '&quot;') + '" class="h-full w-full object-cover" loading="lazy">' + '' + '</figure>' }).join('')
+        go(3)
+      } else if (step === 3) {
+        var label = { residential: 'Luxury Residential Deck', commercial: 'Commercial / Multi-Unit Project', wellness: 'Outdoor Wellness' }[type], list = picks()
+        wz.querySelector('[data-wiz-summary]').innerHTML = '<b>' + label + '</b><br>' + (list.length ? list.join('<br>') : 'No options selected')
+        var summary = label + (list.length ? ' | ' + list.join(' | ') : '')
+        d.querySelectorAll('[data-lead-panel="' + type + '"] [data-selections]').forEach(function (i) { i.value = summary })
+        var msg = d.querySelector('[data-lead-panel="' + type + '"] textarea'); if (msg && !msg.value) msg.value = 'Selections: ' + summary
+        setLead(type); go(4)
+      }
+    }) })
+  }
+
+  // forms: validation, honeypot, confirmation. FORM_ENDPOINT is set at deploy time; without it nothing is sent.
+  var ENDPOINT = window.ODP_FORM_ENDPOINT || ''
+  d.querySelectorAll('form[data-form]').forEach(function (form) {
+    var status = form.querySelector('.form-status')
+    form.addEventListener('submit', function (e) {
+      e.preventDefault()
+      var ok = true
+      form.querySelectorAll('[required]').forEach(function (inp) {
+        var field = inp.closest('.field'), err = field && field.querySelector('.err'), v = (inp.value || '').trim(), msg = ''
+        if (!v) msg = 'Required'
+        else if (inp.type === 'email' && !/^\S+@\S+\.\S+$/.test(v)) msg = 'Enter a valid email'
+        else if (inp.type === 'tel' && v.replace(/\D/g, '').length < 10) msg = 'Enter a 10-digit phone number'
+        if (field) field.classList.toggle('invalid', !!msg)
+        if (err) err.textContent = msg
+        if (msg) ok = false
+      })
+      if (!ok) { var first = form.querySelector('.invalid input, .invalid select'); first && first.focus(); return }
+      if (form.company_website && form.company_website.value) return // spam
+      var data = new FormData(form); data.append('page', location.pathname); data.append('form', form.getAttribute('data-form'))
+      var done = function (sent) {
+        form.innerHTML = '<div class="py-10 text-center"><p class="font-display text-[30px] font-bold">' + (sent ? 'Thank you.' : 'Your request is ready.') + '</p><p class="mt-3 text-graphite/70">' +
+          (sent ? 'We received your project details and will be in touch.' : 'This is the preview site, so nothing was sent. On the live site this goes straight to Ottawa Deck Pro.') + '</p></div>'
+        if (sent && window.gtag) gtag('event', 'generate_lead', { form_name: form.getAttribute('data-form') })
+        if (sent && window.fbq) fbq('track', 'Lead')
+      }
+      if (!ENDPOINT) return done(false)
+      status.textContent = 'Sending…'
+      fetch(ENDPOINT, { method: 'POST', body: data }).then(function (r) { if (r.ok) done(true); else throw 0 }).catch(function () { status.textContent = 'Something went wrong. Please call 613-639-1744 or email hello@ottawadeckpro.ca.' })
+    })
+  })
+
+  // phone-click tracking (one event per click)
+  d.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a[href^="tel:"]'); if (a && window.gtag) gtag('event', 'phone_click', { link_url: a.href }) })
+})()
+
+/* FAQ library search */
+;(() => {
+  const lib = document.querySelector('[data-faq-lib]'); if (!lib) return
+  const input = lib.querySelector('[data-faq-search]'), empty = lib.querySelector('[data-faq-empty]')
+  const items = [...lib.querySelectorAll('[data-faq-q]')], groups = [...lib.querySelectorAll('[data-faq-group]')]
+  input.addEventListener('input', () => {
+    const t = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean)
+    items.forEach((d) => { const hit = t.every((w) => d.dataset.faqQ.includes(w)); d.hidden = !hit; if (t.length && hit) d.open = false })
+    groups.forEach((g) => { g.hidden = !g.querySelector('[data-faq-q]:not([hidden])') })
+    empty.classList.toggle('hidden', items.some((d) => !d.hidden))
+  })
+  if (location.hash) { const d = document.getElementById(location.hash.slice(1)); if (d && d.tagName === 'DETAILS') d.open = true }
+})()
+
+/* Wellness: load the live configurator into the hero on desktop only (saves mobile data) */
+;(() => {
+  const f = document.querySelector('[data-cfg-src]'); if (!f) return
+  const load = () => { if (!f.src && window.matchMedia('(min-width:1024px)').matches) f.src = f.dataset.cfgSrc }
+  load(); window.addEventListener('resize', load, { passive: true })
+})()
+
+/* drag-to-scroll photo bands (mouse); touch scrolls natively */
+;(() => {
+  document.querySelectorAll('.photo-band').forEach((el) => {
+    let down = false, x0 = 0, s0 = 0, moved = false
+    el.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; down = true; moved = false; x0 = e.clientX; s0 = el.scrollLeft; el.style.scrollSnapType = 'none' })
+    window.addEventListener('pointermove', (e) => { if (!down) return; const d = e.clientX - x0; if (Math.abs(d) > 4) moved = true; el.scrollLeft = s0 - d })
+    window.addEventListener('pointerup', () => { if (!down) return; down = false; el.style.scrollSnapType = '' })
+    el.addEventListener('click', (e) => { if (moved) { e.preventDefault(); moved = false } }, true)
+    el.addEventListener('dragstart', (e) => e.preventDefault())
+  })
+})()
+
+/* review collage: tap the client video to play the full testimonial with sound */
+;(() => {
+  document.querySelectorAll('[data-rv-video]').forEach((fig) => {
+    const v = fig.querySelector('video'), b = fig.querySelector('[data-rv-play]')
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { v.removeAttribute('autoplay'); v.pause() }
+    b.addEventListener('click', () => { v.src = v.dataset.full; v.muted = false; v.loop = false; v.controls = true; fig.classList.add('playing'); fig.closest('[data-drag]') && fig.closest('[data-drag]').classList.remove('cursor-drag'); v.play() })
+  })
+})()
+
+/* review collage: expand long reviews, show all */
+;(() => {
+  document.querySelectorAll('[data-rv-quote]').forEach((q) => q.addEventListener('click', () => q.classList.toggle('open')))
+  document.querySelectorAll('[data-rv-more]').forEach((b) => b.addEventListener('click', () => { const s = b.closest('[data-rv]'); s.classList.add('rv-all'); b.parentElement.remove() }))
+})()
+
+/* Start each page at the top, even when the preview frame keeps the previous scroll position */
+;(() => { if (!location.hash) addEventListener('load', () => { try { document.documentElement.scrollIntoView({ block: 'start' }) } catch (e) {} }) })()
+
+// email list offer: one-time popup for new visitors + list signup forms
+;(function () {
+  var d = document, KEY = 'odp_offer_v1', LIST = window.ODP_LIST_ENDPOINT || ''
+  var store = { get: function () { try { return localStorage.getItem(KEY) } catch (e) { return '1' } }, set: function (v) { try { localStorage.setItem(KEY, v) } catch (e) {} } }
+  var pop = d.querySelector('[data-offer-pop]'), last = null
+  function open() {
+    if (!pop || store.get() || /\/contacts/.test(location.pathname)) return
+    store.set('seen'); last = d.activeElement; pop.hidden = false
+    var f = pop.querySelector('input[type=email]'); f && setTimeout(function () { f.focus() }, 60)
+    if (window.gtag) gtag('event', 'view_promotion', { promotion_name: 'offer_5000' })
+  }
+  function close() { if (!pop) return; pop.hidden = true; last && last.focus && last.focus() }
+  if (pop) {
+    pop.querySelectorAll('[data-offer-close]').forEach(function (b) { b.addEventListener('click', close) })
+    d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !pop.hidden) close() })
+    var fired = false, fire = function () { if (!fired) { fired = true; open() } }
+    setTimeout(fire, 20000)
+    addEventListener('scroll', function () { if (scrollY > (d.documentElement.scrollHeight - innerHeight) * 0.45) fire() }, { passive: true })
+    d.addEventListener('mouseout', function (e) { if (!e.relatedTarget && e.clientY < 8) fire() })
+  }
+  d.querySelectorAll('form[data-list]').forEach(function (form) {
+    var err = form.querySelector('.offer-err')
+    form.addEventListener('submit', function (e) {
+      e.preventDefault()
+      var email = (form.email.value || '').trim()
+      if (!/^\S+@\S+\.\S+$/.test(email)) { err.textContent = 'Enter a valid email address.'; form.email.focus(); return }
+      if (!form.consent.checked) { err.textContent = 'Please tick the box to agree to receive our emails.'; return }
+      if (form.company_website && form.company_website.value) return
+      err.textContent = ''
+      store.set('joined')
+      var done = function (sent) {
+        form.innerHTML = '<div class="py-4"><p class="font-display text-[24px] font-bold">You&rsquo;re on the list.</p><p class="mt-1 text-[14px] opacity-70">' +
+          (sent ? 'Your $5,000 offer is saved to your email. Mention it when you book your consultation.' : 'Preview site: nothing was sent. On the live site this adds you to the Ottawa Deck Pro list.') + '</p></div>'
+        if (sent && window.gtag) gtag('event', 'sign_up', { method: 'offer_5000', form_id: form.getAttribute('data-list') })
+        if (sent && window.fbq) fbq('track', 'CompleteRegistration', { content_name: 'offer_5000' })
+      }
+      if (!LIST) return done(false)
+      var data = new FormData(form); data.append('source', form.getAttribute('data-list')); data.append('page', location.pathname); data.append('consent_text', form.querySelector('label span').textContent); data.append('consent_at', new Date().toISOString())
+      fetch(LIST, { method: 'POST', body: data, headers: { Accept: 'application/json' } }).then(function (r) { done(r.ok) }).catch(function () { err.textContent = 'Something went wrong. Please try again.' })
+    })
+  })
+})()

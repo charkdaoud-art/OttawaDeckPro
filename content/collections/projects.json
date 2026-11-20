@@ -1,0 +1,148 @@
+{
+  "items": [
+    {
+      "id": "hot-tub-composite",
+      "title": "Composite deck with hot tub and privacy wall",
+      "division": "residential",
+      "category": "composite",
+      "location": "",
+      "description": "Composite decking, cedar-tone privacy wall and black aluminum railing around a hot tub.",
+      "image": {
+        "src": "custom-composite-deck-contractor-ottawa.webp",
+        "alt": "Composite deck with hot tub, cedar-tone privacy wall and black aluminum railing",
+        "caption": "",
+        "category": "composite",
+        "location": "",
+        "beforeAfter": "none",
+        "source": "actual"
+      },
+      "featured": true
+    },
+    {
+      "id": "multi-level-inlay",
+      "title": "Multi-level composite deck with diamond inlay",
+      "division": "residential",
+      "category": "composite",
+      "location": "",
+      "description": "Two-level composite deck with a contrasting diamond inlay and black railing.",
+      "image": {
+        "src": "durable-pvc-deck-ottawa.webp",
+        "alt": "Multi-level composite deck with diamond inlay and black railing",
+        "caption": "",
+        "category": "composite",
+        "location": "",
+        "beforeAfter": "none",
+        "source": "actual"
+      },
+      "featured": true
+    },
+    {
+      "id": "glass-stair-railing",
+      "title": "Aluminum and glass stair railing",
+      "division": "residential",
+      "category": "railings",
+      "location": "",
+      "description": "Black aluminum stair railing with glass panels on a second-storey deck.",
+      "image": {
+        "src": "glass-stair-railing-second-storey-deck-ottawa.webp",
+        "alt": "Black aluminum stair railing with glass panels",
+        "caption": "",
+        "category": "railings",
+        "location": "",
+        "beforeAfter": "none",
+        "source": "actual"
+      },
+      "featured": true
+    },
+    {
+      "id": "cedar-wraparound",
+      "title": "Cedar-stained wraparound deck",
+      "division": "residential",
+      "category": "wood",
+      "location": "",
+      "description": "Wraparound wood deck with matching railing and stairs.",
+      "image": {
+        "src": "cedar-wraparound-deck-staining-ottawa.webp",
+        "alt": "Cedar-stained wraparound deck with matching railing and stairs",
+        "caption": "",
+        "category": "wood",
+        "location": "",
+        "beforeAfter": "none",
+        "source": "actual"
+      },
+      "featured": true
+    },
+    {
+      "id": "timber-portico",
+      "title": "Timber-frame entry portico",
+      "division": "residential",
+      "category": "structures",
+      "location": "",
+      "description": "Timber-frame front entry with stone columns.",
+      "image": {
+        "src": "timber-frame-entry-portico-stone-columns-ottawa.webp",
+        "alt": "Timber-frame front entry portico with stone columns",
+        "caption": "",
+        "category": "structures",
+        "location": "",
+        "beforeAfter": "none",
+        "source": "actual"
+      },
+      "featured": true
+    },
+    {
+      "id": "pool-deck",
+      "title": "Composite pool deck",
+      "division": "residential",
+      "category": "composite",
+      "location": "",
+      "description": "Grey composite deck with white aluminum railing around an above-ground pool.",
+      "image": {
+        "src": "composite-pool-deck-white-aluminum-railing-ottawa.webp",
+        "alt": "Grey composite pool deck with white aluminum railing",
+        "caption": "",
+        "category": "composite",
+        "location": "",
+        "beforeAfter": "none",
+        "source": "actual"
+      },
+      "featured": true
+    },
+    {
+      "id": "grey-raised",
+      "title": "Raised composite deck with skirting",
+      "division": "residential",
+      "category": "composite",
+      "location": "",
+      "description": "Grey composite deck with black skirting, railing and stairs.",
+      "image": {
+        "src": "grey-composite-deck-skirting-stairs-ottawa.webp",
+        "alt": "Grey composite deck with black skirting, railing and stairs",
+        "caption": "",
+        "category": "composite",
+        "location": "",
+        "beforeAfter": "none",
+        "source": "actual"
+      },
+      "featured": true
+    },
+    {
+      "id": "front-porch-railing",
+      "title": "Modern front porch railing",
+      "division": "residential",
+      "category": "railings",
+      "location": "",
+      "description": "Black aluminum railing on a modern stone front porch.",
+      "image": {
+        "src": "ottawa-railing-posts-and-handrail.webp",
+        "alt": "Black aluminum railing on a modern front porch",
+        "caption": "",
+        "category": "railings",
+        "location": "",
+        "beforeAfter": "none",
+        "source": "actual"
+      },
+      "featured": true
+    }
+  ]
+}

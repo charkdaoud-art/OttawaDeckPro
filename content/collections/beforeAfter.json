@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "id": "ba-stittsville-covered",
+      "category": "residential",
+      "title": "Composite deck under a covered balcony: from stamped concrete to a finished outdoor room",
+      "location": "",
+      "before": {
+        "src": "covered-patio-before-deck-ottawa.webp",
+        "alt": "Before: stamped concrete patio under the balcony",
+        "caption": "Before",
+        "category": "residential",
+        "location": "",
+        "beforeAfter": "before",
+        "source": "actual"
+      },
+      "after": {
+        "src": "composite-deck-covered-patio-after-ottawa.webp",
+        "alt": "After: multi-level composite deck with picture-frame border, lit stairs and lounge seating",
+        "caption": "After",
+        "category": "residential",
+        "location": "",
+        "beforeAfter": "after",
+        "source": "actual"
+      }
+    }
+  ]
+}

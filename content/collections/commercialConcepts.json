@@ -1,0 +1,31 @@
+{
+  "items": [
+    {
+      "src": "commercial-restaurant-patio-deck-ottawa.webp",
+      "alt": "Two-level commercial restaurant patio deck with black aluminum railings, stair lighting and string lights",
+      "caption": "Restaurant patio: two-level composite deck",
+      "category": "commercial",
+      "location": "",
+      "beforeAfter": "none",
+      "source": "actual"
+    },
+    {
+      "src": "condominium-townhouse-deck-replacement-ottawa.webp",
+      "alt": "Row of townhouse condominium decks with white railings on new support posts",
+      "caption": "Condominium townhouse decks",
+      "category": "multi-unit",
+      "location": "",
+      "beforeAfter": "none",
+      "source": "actual"
+    },
+    {
+      "src": "multi-unit-condo-balcony-decks-ottawa.webp",
+      "alt": "Townhouse condominium balcony decks with white railings and string lights at dusk",
+      "caption": "Multi-unit balcony decks",
+      "category": "multi-unit",
+      "location": "",
+      "beforeAfter": "none",
+      "source": "concept"
+    }
+  ]
+}
