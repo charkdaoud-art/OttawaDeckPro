@@ -9,6 +9,7 @@
 
 	# old Wix duplicate page
 	redir /copy-of-pvc-deck-carp /pvc-deck-carp 301
+	redir /welness /wellness 301
 
 	# one URL per page: drop trailing slash and .html, like the Wix URLs
 	@slash path_regexp slash ^(.+)/$
@@ -25,7 +26,7 @@
 
 	handle_errors {
 		@404 expression {err.status_code} == 404
-		rewrite @404 /index.html
+		rewrite @404 /404.html
 		file_server {
 			status 404
 		}

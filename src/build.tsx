@@ -19,7 +19,7 @@ import { execSync } from 'node:child_process'
 import metaJson from '../content/meta.json'
 import { CTX } from './lib'
 import { ORIGIN } from './site'
-import { ExistingPage, Home, Gallery, Faq, Contacts, BlogIndex, Post, ServiceAreas, Wellness, Commercial, WellnessProduct, PRODUCTS } from './pages'
+import { ExistingPage, Home, Gallery, Faq, Contacts, BlogIndex, Post, ServiceAreas, Wellness, Commercial, WellnessProduct, PRODUCTS, NotFound } from './pages'
 
 const preview = process.argv.includes('--preview')
 const OUT = path.resolve(preview ? 'preview' : 'dist')
@@ -71,6 +71,7 @@ fs.copyFileSync('assets/site.js', path.join(OUT, 'assets/site.js'))
 fs.cpSync('public/img', path.join(OUT, 'img'), { recursive: true })
 if (fs.existsSync('public/media')) fs.cpSync('public/media', path.join(OUT, 'media'), { recursive: true })
 if (!preview && fs.existsSync('public/admin')) fs.cpSync('public/admin', path.join(OUT, 'admin'), { recursive: true })
+if (!preview) { CTX.path = '/404'; CTX.depth = 0; fs.writeFileSync(path.join(OUT, '404.html'), '<!DOCTYPE html>' + renderToStaticMarkup(<NotFound />)) }
 // 3D retreat configurator (single-file build, source project lives separately)
 const cfg = path.resolve('public/wellness/retreat-configurator.html')
 if (fs.existsSync(cfg)) { fs.mkdirSync(path.join(OUT, 'wellness/retreat-configurator'), { recursive: true }); fs.copyFileSync(cfg, path.join(OUT, 'wellness/retreat-configurator/index.html')) }

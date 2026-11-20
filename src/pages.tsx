@@ -726,3 +726,20 @@ export function WellnessProduct({ p }: { p: any }) {
     </Document>
   )
 }
+
+export function NotFound() {
+  const links: [string, string][] = [['Decks', '/decks'], ['Railings', '/railings'], ['Wellness', '/wellness'], ['Our projects', '/gallery'], ['Service areas', '/service-areas'], ['Contact', '/contacts']]
+  return (
+    <Document meta={{ title: 'Page not found | Ottawa Deck Pro', canonical: ORIGIN + '/', robots: 'noindex' }}>
+      <section className="bg-charcoal pb-24 pt-40 text-ivory lg:pt-48">
+        <div className="mx-auto max-w-[1440px] px-5 lg:px-10">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.22em] text-bronze-light">404</p>
+          <h1 className="mt-4 font-display text-[clamp(2.4rem,6vw,5rem)] font-extrabold uppercase leading-[0.98] tracking-[-0.02em]">Page not found</h1>
+          <p className="mt-5 max-w-xl text-[18px] text-ivory/75">This page moved or never existed. Try one of these:</p>
+          <div className="mt-8 flex flex-wrap gap-3">{links.map(([l, h]) => <a key={h} href={h} className="btn btn-ghost-light">{l}</a>)}</div>
+          <a href="/" className="btn btn-primary mt-8">Back to home</a>
+        </div>
+      </section>
+    </Document>
+  )
+}
