@@ -199,7 +199,18 @@
       }
       if (!ENDPOINT) return done(false)
       status.textContent = 'Sending…'
-      fetch(ENDPOINT, { method: 'POST', body: data, headers: { Accept: 'application/json' } }).then(function (r) { if (r.ok) done(true); else throw 0 }).catch(function () { status.textContent = 'Something went wrong. Please call 613-639-1744 or email hello@ottawadeckpro.ca.' })
+      // drop empty file inputs; if the form service refuses attachments, resend the details without them
+      var hasFiles = false
+      ;['photos', 'documents'].forEach(function (k) { var fs = data.getAll(k).filter(function (f) { return f && f.size }); data.delete(k); fs.forEach(function (f) { data.append(k, f); hasFiles = true }) })
+      var post = function (body) { return fetch(ENDPOINT, { method: 'POST', body: body, headers: { Accept: 'application/json' } }) }
+      var fail = function () { status.textContent = 'Something went wrong. Please call 613-639-1744 or email hello@ottawadeckpro.ca.' }
+      post(data).then(function (r) {
+        if (r.ok) return done(true)
+        if (!hasFiles) return fail()
+        var lite = new FormData(); data.forEach(function (v, k) { if (k !== 'photos' && k !== 'documents') lite.append(k, v) })
+        lite.append('attachments', 'Customer attached files that could not be uploaded. Ask them to email photos to hello@ottawadeckpro.ca.')
+        return post(lite).then(function (r2) { r2.ok ? done(true) : fail() })
+      }).catch(fail)
     })
   })
 
