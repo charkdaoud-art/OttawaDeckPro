@@ -1,7 +1,7 @@
 import React from 'react'
 import reviewsJson from '../content/collections/reviews.json'
 import settingsJson from '../content/collections/settings.json'
-import { BRAND, NAV, STATS, TESTIMONIALS, ORIGIN, TRACKING, PHOTOS, type Photo } from './site'
+import { BRAND, NAV, STATS, TESTIMONIALS, ORIGIN, TRACKING, FORMS, PHOTOS, type Photo } from './site'
 import { CTX, href, asset, imgSrc, wixImage, Inline, plain, isCaps } from './lib'
 import type { Block, Card, Section } from './parse'
 
@@ -69,6 +69,7 @@ export function Document({ meta, children, dark = true }: { meta: Meta; children
         <Footer />
         <MobileBar />
         <OfferPopup />
+        {!CTX.preview && (FORMS.estimate || FORMS.emailList) && <script dangerouslySetInnerHTML={{ __html: `window.ODP_FORM_ENDPOINT=${JSON.stringify(FORMS.estimate)};window.ODP_LIST_ENDPOINT=${JSON.stringify(FORMS.emailList || FORMS.estimate)};` }} />}
         <script src={asset('assets/site.js')} defer />
       </body>
     </html>
