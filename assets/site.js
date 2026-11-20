@@ -190,7 +190,7 @@
       })
       if (!ok) { var first = form.querySelector('.invalid input, .invalid select'); first && first.focus(); return }
       if (form.company_website && form.company_website.value) return // spam
-      var data = new FormData(form); data.append('page', location.pathname); data.append('form', form.getAttribute('data-form'))
+      var data = new FormData(form); data.append('page', location.pathname); data.append('form', form.getAttribute('data-form')); data.append('_subject', 'New estimate request from ottawadeckpro.ca')
       var done = function (sent) {
         form.innerHTML = '<div class="py-10 text-center"><p class="font-display text-[30px] font-bold">' + (sent ? 'Thank you.' : 'Your request is ready.') + '</p><p class="mt-3 text-graphite/70">' +
           (sent ? 'We received your project details and will be in touch.' : 'This is the preview site, so nothing was sent. On the live site this goes straight to Ottawa Deck Pro.') + '</p></div>'
@@ -199,7 +199,7 @@
       }
       if (!ENDPOINT) return done(false)
       status.textContent = 'Sending…'
-      fetch(ENDPOINT, { method: 'POST', body: data }).then(function (r) { if (r.ok) done(true); else throw 0 }).catch(function () { status.textContent = 'Something went wrong. Please call 613-639-1744 or email hello@ottawadeckpro.ca.' })
+      fetch(ENDPOINT, { method: 'POST', body: data, headers: { Accept: 'application/json' } }).then(function (r) { if (r.ok) done(true); else throw 0 }).catch(function () { status.textContent = 'Something went wrong. Please call 613-639-1744 or email hello@ottawadeckpro.ca.' })
     })
   })
 
@@ -295,7 +295,7 @@
         if (sent && window.fbq) fbq('track', 'CompleteRegistration', { content_name: 'offer_5000' })
       }
       if (!LIST) return done(false)
-      var data = new FormData(form); data.append('source', form.getAttribute('data-list')); data.append('page', location.pathname); data.append('consent_text', form.querySelector('label span').textContent); data.append('consent_at', new Date().toISOString())
+      var data = new FormData(form); data.append('source', form.getAttribute('data-list')); data.append('_subject', 'New $5,000 offer signup'); data.append('page', location.pathname); data.append('consent_text', form.querySelector('label span').textContent); data.append('consent_at', new Date().toISOString())
       fetch(LIST, { method: 'POST', body: data, headers: { Accept: 'application/json' } }).then(function (r) { done(r.ok) }).catch(function () { err.textContent = 'Something went wrong. Please try again.' })
     })
   })
