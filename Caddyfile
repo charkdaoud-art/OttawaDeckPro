@@ -22,6 +22,7 @@
 	# old Wix duplicate page
 	redir /copy-of-pvc-deck-carp /pvc-deck-carp 301
 	redir /welness /wellness 301
+	redir /deck-packages /decks 301
 
 	# one URL per page: drop trailing slash and .html, like the Wix URLs
 	@slash path_regexp slash ^(.+)/$

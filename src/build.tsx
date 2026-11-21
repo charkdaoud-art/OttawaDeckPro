@@ -29,6 +29,7 @@ CTX.preview = preview
 const existing = Object.keys(metaJson as object)
 const routes: [string, () => React.ReactElement][] = []
 for (const p of existing) {
+  if (p === '/deck-packages') continue // removed (owner decision Nov 21): 301 to /decks in Caddyfile
   if (p === '/') routes.push([p, () => <Home />])
   else if (p === '/gallery') routes.push([p, () => <Gallery />])
   else if (p === '/faq') routes.push([p, () => <Faq />])
@@ -43,6 +44,12 @@ if (existing.includes('/reviews')) throw new Error('URL conflict: /reviews alrea
 routes.push(['/reviews', () => <Reviews />], ['/service-areas', () => <ServiceAreas />], ['/wellness', () => <Wellness />], ['/commercial-deck-construction', () => <Commercial />])
 for (const p of PRODUCTS) routes.push(['/wellness/products/' + p.slug, () => <WellnessProduct p={p} />])
 
+// never publish placeholder prices: every calculator range must be confirmed by the owner
+{
+  const pr = JSON.parse(fs.readFileSync('content/collections/pricing.json', 'utf8'))
+  const unconfirmed = ['materials', 'railings', 'stairs'].flatMap((k) => pr[k].filter((o: any) => !o.confirmed).map((o: any) => `${k}: ${o.label}`))
+  if (!preview && unconfirmed.length && !process.env.ALLOW_UNCONFIRMED_PRICES) throw new Error('Unconfirmed calculator prices (content/collections/pricing.json): ' + unconfirmed.join(', '))
+}
 fs.rmSync(OUT, { recursive: true, force: true })
 fs.mkdirSync(OUT, { recursive: true })
 let n = 0

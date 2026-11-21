@@ -151,7 +151,7 @@ const FOOTER_AREAS: [string, string][] = [['Stittsville', 'stittsville'], ['Kana
 const OFFER_TERMS = [
   'Valid on new projects with a signed contract of $40,000 or more, before tax.',
   'You must join the list before your contract is signed. One offer per household and property.',
-  'Applied as a credit on your final invoice. No cash value. Cannot be combined with other offers or deck packages.',
+  'Applied as a credit on your final invoice. No cash value. Cannot be combined with other offers.',
   'Available in Ottawa Deck Pro service areas only. Ottawa Deck Pro may change or end this offer at any time; offers already in a signed contract are honoured.',
 ]
 export function OfferForm({ id, dark = false }: { id: string; dark?: boolean }) {
@@ -307,7 +307,6 @@ export function PageHero({ h1, eyebrow, blocks = [], img, photo, trail, short = 
           <Btn to="/contacts#estimate">Get a free estimate <Arrow /></Btn>
           {as.filter((a) => a.h?.startsWith('tel:')).map((a, i) => <a key={i} href={BRAND.phoneHref} className="btn btn-ghost-light" data-track="phone">Call {BRAND.phone}</a>)}
           {as.filter((a) => a.h && !a.h.startsWith('tel:') && !/contacts|deck-packages$/.test(a.h) && a.x).map((a, i) => <Btn key={i} to={a.h} variant="ghost-light">{a.x}</Btn>)}
-          {as.some((a) => /deck-packages$/.test(a.h || '')) && CTX.path !== '/deck-packages' ? <Btn to="/deck-packages" variant="ghost-light">View Deck Packages</Btn> : null}
         </div>
       </div>
     </section>

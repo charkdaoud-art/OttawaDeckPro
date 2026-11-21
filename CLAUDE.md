@@ -12,13 +12,14 @@ Static React SSR + Tailwind rebuild of the old Wix site. Every Wix URL, title, m
 ## Hosting
 - Railway project, auto-deploys from `main` of charkdaoud-art/OttawaDeckPro. Temp URL: ottawadeckpro-production.up.railway.app
 - Dockerfile: builds dist/, then Caddy serves it and proxies /api/* to server/api.mjs.
-- Caddyfile: clean URLs, no trailing slash, 301s (/copy-of-pvc-deck-carp, /welness), bare domain → www, real 404 page.
+- Caddyfile: clean URLs, no trailing slash, 301s (/copy-of-pvc-deck-carp, /welness, /deck-packages → /decks), bare domain → www, real 404 page. Pages no-cache; assets versioned (?v=hash) and cached 1 year.
 - DNS is on Cloudflare (GoDaddy is only the registrar). Email is Google Workspace: never touch MX/SPF/DKIM/DMARC/Brevo records.
 
 ## Forms (server/api.mjs, Brevo)
 - /api/lead: lead email to hello@ottawadeckpro.ca (photos attached) + branded client confirmation (team photo, "within 24 hours", 3D vs built).
 - /api/subscribe: $5,000 offer list (Brevo list ID 2) + welcome email with offer conditions + notice to owner.
 - Homepage flow (Nov 21): hero, trust bar, divisions+services, work (grid, before/after, reels), how it works (3D vs built + 4 steps), crew, reviews (top 10 + /reviews page), FAQ top 5, service area map, wizard + estimate. Review count shown as "100+" (content/collections/settings.json).
+- Service pages /decks /railings /staining /fences: src/service.tsx (premium template, all Wix text kept). Deck cost calculator on /decks reads content/collections/pricing.json (owner-confirmed ranges; production build refuses unconfirmed prices). Deck packages removed from the site (owner, Nov 21).
 - /api/unsubscribe: signed one-click link in the welcome email (and List-Unsubscribe header). Blacklists the contact in Brevo and removes it from the list.
 - Railway variables: BREVO_API_KEY, BREVO_LIST_ID. Brevo IP blocking for API keys must stay OFF (Railway IPs rotate).
 - Health: /api/health?check=1

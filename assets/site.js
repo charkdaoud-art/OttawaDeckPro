@@ -311,3 +311,43 @@
     })
   })
 })()
+
+// deck cost calculator (/decks)
+;(function () {
+  var root = document.querySelector('[data-calc]'); if (!root) return
+  var cfg = JSON.parse(root.getAttribute('data-calc'))
+  var $ = function (s) { return root.querySelector(s) }
+  var L = $('[data-calc-l]'), W = $('[data-calc-w]'), S = $('[data-calc-slider]'), LF = $('[data-calc-lf]'), lfWrap = $('[data-calc-lf-wrap]')
+  var lfTouched = false
+  var pick = function (name, list) { var el = root.querySelector('input[name="' + name + '"]:checked'); return list.filter(function (o) { return o.id === (el && el.value) })[0] || list[0] }
+  var money = function (n) { n = Math.round(n / 100) * 100; return '$' + n.toLocaleString('en-CA') }
+  var clamp = function (v, a, b) { v = parseFloat(v) || 0; return Math.max(a, Math.min(b, v)) }
+  var state = ''
+  function calc(from) {
+    var l = clamp(L.value, 4, 80), w = clamp(W.value, 4, 60)
+    if (from === 'slider') { var a = clamp(S.value, 60, 1200), ratio = l / w; w = Math.max(4, Math.round(Math.sqrt(a / ratio))); l = Math.max(4, Math.round(a / w)); L.value = l; W.value = w }
+    var area = l * w; S.value = Math.min(1200, area)
+    root.querySelector('[data-calc-area]').textContent = area.toLocaleString('en-CA')
+    if (!lfTouched) LF.value = Math.round(l + 2 * w)
+    var m = pick('calc-mat', cfg.materials), r = pick('calc-rail', cfg.railings), st = pick('calc-stairs', cfg.stairs)
+    lfWrap.hidden = r.id === 'none'
+    var lf = r.id === 'none' ? 0 : clamp(LF.value, 0, 400)
+    var parts = [[m.label + ' deck · ' + area + ' sq ft', area * m.low, area * m.high], [r.label + ' railing' + (lf ? ' · ' + lf + ' ft' : ''), lf * r.low, lf * r.high], ['Stairs · ' + st.label.toLowerCase(), st.low, st.high]].filter(function (p) { return p[2] > 0 })
+    var lo = parts.reduce(function (s, p) { return s + p[1] }, 0), hi = parts.reduce(function (s, p) { return s + p[2] }, 0)
+    var plus = m.plus ? '+' : ''
+    root.querySelector('[data-calc-total]').textContent = money(lo) + ' to ' + money(hi) + plus
+    var brk = root.querySelector('[data-calc-break]'); if (brk) brk.innerHTML = parts.map(function (p) { return '<div><dt>' + p[0] + '</dt><dd>' + money(p[1]) + ' to ' + money(p[2]) + '</dd></div>' }).join('')
+    state = 'Calculator estimate: ' + l + ' x ' + w + ' ft (' + area + ' sq ft) ' + m.label + ' deck, ' + r.label.toLowerCase() + ' railing' + (lf ? ' (' + lf + ' ft)' : '') + ', stairs: ' + st.label.toLowerCase() + '. Range shown: ' + money(lo) + ' to ' + money(hi) + plus + '.'
+  }
+  L.addEventListener('input', function () { calc() }); W.addEventListener('input', function () { calc() })
+  S.addEventListener('input', function () { calc('slider') })
+  LF.addEventListener('input', function () { lfTouched = true; calc() })
+  root.addEventListener('change', function (e) { if (e.target.type === 'radio') calc() })
+  $('[data-calc-cta]').addEventListener('click', function () {
+    var msg = document.querySelector('#estimate textarea[name="message"]')
+    if (msg && !msg.value) msg.value = state
+    var det = msg && msg.closest('details'); if (det) det.open = true
+    if (window.gtag) gtag('event', 'calculator_quote', { value_text: state })
+  })
+  calc()
+})()

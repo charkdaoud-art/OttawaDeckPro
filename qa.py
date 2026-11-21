@@ -5,10 +5,12 @@ B = json.load(open('content/blocks.json')); M = json.load(open('content/meta.jso
 DIST = 'dist'
 def page_file(p): return os.path.join(DIST, 'index.html' if p == '/' else p.strip('/') + '/index.html')
 def norm(t): t = re.sub(r'\[([^\]]*)\]\([^)]+\)', r'\1', t or ''); t = t.replace('​', '').replace('’', "'").replace('‘', "'").replace('“', '"').replace('”', '"'); t = re.sub(r'(^|\s)[-•]\s', ' ', t); return re.sub(r'\s+', ' ', t).strip().lower()
-REDIRECTS = {'/copy-of-pvc-deck-carp': '/pvc-deck-carp'}
+REDIRECTS = {'/copy-of-pvc-deck-carp': '/pvc-deck-carp', '/deck-packages': '/decks'}
+# text the owner chose to remove (deck packages and /decks budget tiers dropped Nov 21 2026)
+REMOVED = {'real ottawa projects', 'under $20k deck samples', '$20k – $40k deck samples', '$40k – $60k deck samples', '$60k – $90k deck samples', '$90k+ deck samples', 'looking for a simpler starting option?', 'explore our professionally designed floating deck packages with transparent starting pricing.'}
 SKIP_TEXT = re.compile(r'^(email|phone|address|timing|text)\s*:|^\*|^instant quote|^shop$|^submit$|^\[\]', re.I)
 rows = []; all_ok = True
-pages = set(p for p in M if p not in REDIRECTS) | {'/service-areas', '/wellness', '/wellness/retreat-configurator', '/commercial-deck-construction'}
+pages = set(p for p in M if p not in REDIRECTS) | {'/service-areas', '/wellness', '/wellness/retreat-configurator', '/commercial-deck-construction', '/reviews'}
 broken = set()
 for p in sorted(M):
     r = {'url': p}
@@ -24,7 +26,7 @@ for p in sorted(M):
     main = soup.find('main'); body = norm(main.get_text(' ')) if main else ''
     # content coverage: every heading, paragraph and list item from the original page
     texts = [norm(b.get('x')) for b in B[p] if b['t'] in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6') and b.get('x')]
-    texts = [t for t in texts if t and not SKIP_TEXT.search(t) and 'google.com/maps' not in t]
+    texts = [t for t in texts if t and not SKIP_TEXT.search(t) and 'google.com/maps' not in t and t not in REMOVED]
     bodyc = body.replace(' ', '')
     missing = [t for t in texts if t.replace(' ', '') not in bodyc]
     # internal links from the original page body

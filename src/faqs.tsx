@@ -34,7 +34,6 @@ const CORE: Record<string, string[]> = {
   '/railings': ['railings', 'code', 'glass', 'aluminum'],
   '/staining': ['staining', 'wood', 'maintenance'],
   '/fences': ['fences'],
-  '/deck-packages': ['packages', 'cost'],
   '/backyard-makeover': FAMILY['backyard-makeover'],
   '/gallery': ['design'], '/contacts': ['process'], '/service-areas': ['process', 'permits'], '/blog': ['cost', 'materials'],
   '/commercial-deck-construction': ['commercial'], '/wellness': ['wellness'],

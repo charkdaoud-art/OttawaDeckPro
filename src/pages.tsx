@@ -11,6 +11,7 @@ import { TESTIMONIALS } from './site'
 import { pickFaqs, toQA, MoreFaqs, FaqLibrary, FAQS, FAQ_TOTAL, type Faq } from './faqs'
 const withFaqs = (path: string, n = 8, existing: string[] = []) => { const items = pickFaqs(path, existing, n); return { items, ld: items.length ? [faqLd(toQA(items))] : [] } }
 import settingsJson from '../content/collections/settings.json'
+import { DecksPage, RailingsPage, StainingPage, FencesPage } from './service'
 const SETTINGS = settingsJson as any
 import wellnessPhotosRaw from '../content/collections/wellnessPhotos.json'
 const WELLP = [...(wellnessPhotosRaw as any).items].sort((a: any, b: any) => (a.source === 'actual' ? 0 : 1) - (b.source === 'actual' ? 0 : 1))
@@ -50,6 +51,10 @@ const CORE: Record<string, { label: string; photo: Photo; photos: Photo[] }> = {
 const BAND: Record<string, string[]> = { 'deck-builder': ['composite', 'wood', 'structures'], 'composite-deck': ['composite'], 'pvc-deck': ['composite'], 'aluminum-railing': ['railings'], 'glass-railing': ['railings'], 'deck-repair': ['wood', 'construction'], 'backyard-makeover': ['structures', 'composite'], '/decks': ['composite', 'wood'], '/railings': ['railings'], '/staining': ['wood'], '/fences': ['fences'], '/backyard-makeover': ['structures', 'composite'], '/deck-packages': ['composite', 'wood'] }
 /* ---------- generic page for every existing service and location URL ---------- */
 export function ExistingPage({ path }: { path: string }) {
+  if (path === '/decks') return <DecksPage metaFor={metaFor} />
+  if (path === '/railings') return <RailingsPage metaFor={metaFor} />
+  if (path === '/staining') return <StainingPage metaFor={metaFor} />
+  if (path === '/fences') return <FencesPage metaFor={metaFor} />
   let raw = (B[path] || []).map((b) => ({ ...b }))
   // Proposed fix: /decks has a promo line as its H1; the page heading "CUSTOM DECKS" becomes the H1.
   if (path === '/decks') raw = raw.map((b) => (b.t === 'h1' ? { ...b, t: 'h2' } : b.t === 'h3' && /^CUSTOM DECKS$/.test(b.x || '') ? { ...b, t: 'h1' } : b))
@@ -160,14 +165,6 @@ export function Home() {
                 </div>
               </a>
             ))}
-          </div>
-          <div className="mt-6 grid items-center gap-8 rounded-[28px] bg-sand p-8 lg:grid-cols-[1.2fr_1fr] lg:p-12">
-            <div className="reveal">
-              <h2 className="font-display text-[clamp(1.7rem,3vw,2.6rem)] font-bold uppercase leading-tight tracking-tight">LOOKING FOR A SIMPLER STARTING OPTION?</h2>
-              <p className="mt-3 max-w-lg text-[16px] text-graphite/70">Explore our professionally designed floating deck packages with transparent starting pricing.</p>
-              <Btn to="/deck-packages" variant="dark" className="mt-6">View Deck Packages <Arrow /></Btn>
-            </div>
-            <img src={imgSrc(RENDERS.pkg16x16.file)} alt={RENDERS.pkg16x16.alt} loading="lazy" className="reveal mx-auto w-full max-w-sm rounded-[22px]" />
           </div>
           <p className="mx-auto mt-10 max-w-4xl text-center text-[17px] leading-relaxed text-graphite/70"><Inline text={seo} /></p>
         </div>

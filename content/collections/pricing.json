@@ -1,0 +1,90 @@
+{
+  "note": "Deck cost calculator ranges, installed, before tax. Decking per sq ft, railing per linear ft, stairs flat. Confirmed by owner Nov 21 2026. Set confirmed:false on any placeholder: the production build refuses to run with unconfirmed prices.",
+  "materials": [
+    {
+      "id": "pt",
+      "label": "Pressure-treated",
+      "low": 30,
+      "high": 45,
+      "plus": false,
+      "confirmed": true
+    },
+    {
+      "id": "cedar",
+      "label": "Cedar",
+      "low": 50,
+      "high": 70,
+      "plus": false,
+      "confirmed": true
+    },
+    {
+      "id": "composite",
+      "label": "Composite",
+      "low": 65,
+      "high": 100,
+      "plus": true,
+      "confirmed": true
+    },
+    {
+      "id": "pvc",
+      "label": "PVC",
+      "low": 85,
+      "high": 120,
+      "plus": true,
+      "confirmed": true
+    }
+  ],
+  "railings": [
+    {
+      "id": "none",
+      "label": "No railing",
+      "low": 0,
+      "high": 0,
+      "confirmed": true
+    },
+    {
+      "id": "wood",
+      "label": "Wood",
+      "low": 60,
+      "high": 80,
+      "confirmed": true
+    },
+    {
+      "id": "aluminum",
+      "label": "Aluminum",
+      "low": 90,
+      "high": 140,
+      "confirmed": true
+    },
+    {
+      "id": "glass",
+      "label": "Glass",
+      "low": 180,
+      "high": 250,
+      "confirmed": true
+    }
+  ],
+  "stairs": [
+    {
+      "id": "none",
+      "label": "None",
+      "low": 0,
+      "high": 0,
+      "confirmed": true
+    },
+    {
+      "id": "short",
+      "label": "1 to 4 steps",
+      "low": 800,
+      "high": 1800,
+      "confirmed": true
+    },
+    {
+      "id": "flight",
+      "label": "Full flight",
+      "low": 2500,
+      "high": 5500,
+      "confirmed": true
+    }
+  ]
+}

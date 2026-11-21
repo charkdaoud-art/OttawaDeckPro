@@ -159,7 +159,6 @@ export const NAV = [
     { label: 'Custom Deck Construction', href: '/decks', desc: 'Composite, PVC, cedar and pressure-treated' },
     { label: 'Aluminum & Glass Railings', href: '/railings', desc: 'Picket, panoramic glass and hybrid' },
     { label: 'Backyard Makeovers', href: '/backyard-makeover', desc: 'Deck, railing and layout together' },
-    { label: 'Deck Packages', href: '/deck-packages', desc: 'Four freestanding packages from $4,499' },
     { label: 'Fences', href: '/fences', desc: 'Iron, PVC and chain link' },
     { label: 'Deck Staining', href: '/staining', desc: 'Wash, sand and stain' },
     { label: 'Deck Repair', href: '/deck-repair-kanata', desc: 'Board replacement and structural repair' },
