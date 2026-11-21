@@ -14,6 +14,7 @@ const humanize = (f: string) => {
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import fs from 'node:fs'
+import crypto from 'node:crypto'
 import path from 'node:path'
 import { execSync } from 'node:child_process'
 import metaJson from '../content/meta.json'
@@ -69,6 +70,12 @@ for (const [p, render] of routes) {
 fs.mkdirSync(path.join(OUT, 'assets'), { recursive: true })
 execSync(`npx tailwindcss -c tailwind.config.cjs -i styles/input.css -o ${OUT}/assets/site.css --minify`, { stdio: 'pipe' })
 fs.copyFileSync('assets/site.js', path.join(OUT, 'assets/site.js'))
+// cache-bust: every build gives site.css / site.js a new ?v= so browsers never mix old styles with new pages
+{
+  const v = crypto.createHash('md5').update(fs.readFileSync(path.join(OUT, 'assets/site.css'))).update(fs.readFileSync(path.join(OUT, 'assets/site.js'))).digest('hex').slice(0, 10)
+  const walk = (d: string) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const f = path.join(d, e.name); if (e.isDirectory()) walk(f); else if (f.endsWith('.html')) fs.writeFileSync(f, fs.readFileSync(f, 'utf8').replace(/(assets\/site\.(?:css|js))(?=["'])/g, `$1?v=${v}`)) } }
+  walk(OUT)
+}
 fs.cpSync('public/img', path.join(OUT, 'img'), { recursive: true })
 if (fs.existsSync('public/media')) fs.cpSync('public/media', path.join(OUT, 'media'), { recursive: true })
 if (!preview && fs.existsSync('public/admin')) fs.cpSync('public/admin', path.join(OUT, 'admin'), { recursive: true })
