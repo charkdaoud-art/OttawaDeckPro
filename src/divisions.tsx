@@ -89,7 +89,7 @@ export function Divisions() {
       <div className="mt-10 grid gap-5 lg:grid-cols-2 lg:grid-rows-[auto_auto]">
         {cards.map((c, i) => (
           <a key={c.k} href={href(c.to)} className={`division reveal group ${i === 0 ? 'division-lead lg:row-span-2' : 'division-side'}`} style={{ transitionDelay: i * 80 + 'ms' }}>
-            {c.img ? <Media item={c.img} className="division-media" imgClass="transition duration-[1.4s] group-hover:scale-[1.05]" sizes="(min-width:1024px) 33vw, 100vw" /> : <Visual kind={(c as any).kind} photos={(c as any).kind === 'commercial' ? [CS.multiUnitTerrace] : WELL.slice(1)} className="division-media" />}
+            {c.img ? <Media item={c.img} className="division-media" imgClass="transition duration-[1.4s] group-hover:scale-[1.05]" sizes="(min-width:1024px) 33vw, 100vw" /> : <Visual kind={(c as any).kind} photos={(c as any).kind === 'commercial' ? [CS.multiUnitReal] : WELL.slice(1)} className="division-media" />}
             <div className="p-7 lg:p-9">
               <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-bronze-dark">{c.k}</p>
               <h3 className="mt-3 font-display text-[30px] font-semibold leading-[1.05] tracking-[-0.02em]">{c.title}</h3>
@@ -197,12 +197,19 @@ export function ShowroomMap({ legacyHeading }: { legacyHeading: string }) {
           <p className="mt-4 text-[13px] text-graphite/55" data-map-empty hidden>No documented projects in this category yet.</p>
           <Btn to="/service-areas" variant="outline" className="mt-8">All service areas <Arrow /></Btn>
         </div>
-        <div className="reveal relative aspect-[5/4] overflow-hidden rounded-[28px] bg-charcoal" data-map>
+        <div className="reveal map-live relative aspect-[5/4] overflow-hidden rounded-[28px]" data-map>
           <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true">
-            <path d="M0 34 C 20 30, 40 34, 60 30 S 90 22, 100 24" stroke="#2f4152" strokeWidth="2.2" fill="none" />
-            <circle cx="50" cy="48" r="44" stroke="#7CBC42" strokeOpacity=".25" strokeDasharray="1 1.5" fill="none" strokeWidth=".4" />
+            <defs><radialGradient id="mapGlow" cx="50%" cy="50%" r="50%"><stop offset="0" stopColor="#7CBC42" stopOpacity=".28" /><stop offset="1" stopColor="#7CBC42" stopOpacity="0" /></radialGradient></defs>
+            <circle cx="50" cy="48" r="44" fill="url(#mapGlow)" />
+            <path d="M8 70 C 22 62, 30 80, 46 74 S 70 60, 92 70" stroke="#ffffff" strokeOpacity=".55" strokeWidth=".5" fill="none" />
+            <path d="M4 52 C 20 46, 34 58, 50 52 S 80 40, 98 46" stroke="#ffffff" strokeOpacity=".45" strokeWidth=".5" fill="none" />
+            <path d="M10 88 C 30 82, 52 94, 70 86 S 90 82, 100 84" stroke="#ffffff" strokeOpacity=".45" strokeWidth=".5" fill="none" />
+            <path d="M0 34 C 20 30, 40 34, 60 30 S 90 22, 100 24" stroke="#7FB8E0" strokeWidth="3.2" fill="none" strokeLinecap="round" />
+            <path d="M0 34 C 20 30, 40 34, 60 30 S 90 22, 100 24" stroke="#BFE0F5" strokeWidth="1" fill="none" strokeLinecap="round" />
+            <circle cx="50" cy="48" r="44" stroke="#4F8A2A" strokeOpacity=".55" strokeDasharray="1.2 1.4" fill="none" strokeWidth=".45" />
           </svg>
-          <span className="absolute left-[3%] top-[6%] text-[11px] font-semibold uppercase tracking-[0.2em] text-ivory/40">Ottawa River</span>
+          <span className="absolute left-[3%] top-[6%] text-[11px] font-semibold uppercase tracking-[0.2em] text-[#3d6f8f]">Ottawa River</span>
+          <span className="map-radius-tag">60 km service radius</span>
           {MAP_PTS.map(([n, p, x, y]) => <a key={n} href={href(p)} className="map-pt" style={{ left: x + '%', top: y + '%' }}><i />{n}</a>)}
           {M.map((m) => (
             <button key={m.id} type="button" className="map-marker" style={{ left: m.x + '%', top: m.y + '%' }} data-marker data-cats={[m.division, m.category].join(' ')}
@@ -218,7 +225,7 @@ export function ShowroomMap({ legacyHeading }: { legacyHeading: string }) {
             <p className="mt-2 text-[14px] leading-relaxed text-graphite/70" data-mc-desc />
             <a className="link mt-3 inline-block text-[14px]" data-mc-link target="_blank" rel="noopener">View</a>
           </div>
-          <span className="absolute right-4 top-[6%] text-[10px] text-ivory/35">Schematic, not to scale</span>
+          <span className="absolute right-4 top-[6%] text-[10px] text-graphite/45">Schematic, not to scale</span>
         </div>
       </div>
     </Section>

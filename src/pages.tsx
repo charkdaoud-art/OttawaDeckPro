@@ -113,7 +113,7 @@ export function Home() {
     address: { '@type': 'PostalAddress', streetAddress: BRAND.street, addressLocality: 'Ottawa', addressRegion: 'ON', postalCode: BRAND.postal, addressCountry: 'CA' },
     openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], opens: '08:00', closes: '18:00' }],
     areaServed: AREAS.map(([, n]) => n).concat(['Ottawa', 'Richmond', 'Almonte', 'Calabogie', 'Mississippi Mills']), sameAs: [BRAND.instagram, BRAND.facebook] }]
-  const meta = metaFor('/', [...ld, faqLd(toQA(pickFaqs('/', [], 10)))]); meta.ld = (meta.ld || []).filter((s) => !/"LocalBusiness"/.test(s))
+  const meta = metaFor('/', [...ld, faqLd(toQA(pickFaqs('/', [], 5)))]); meta.ld = (meta.ld || []).filter((s) => !/"LocalBusiness"/.test(s))
   return (
     <Document meta={meta}>
       {/* 01 HERO */}
@@ -139,36 +139,8 @@ export function Home() {
 
       <TrustBar />
 
-      {/* 02 SOCIAL */}
-      <Reels />
-
-      {/* 03 THREE DIVISIONS */}
+      {/* 03 WHAT WE BUILD: divisions + services */}
       <Divisions />
-
-      {/* 03b CREW: trust early */}
-      <Crew />
-
-      {/* 03c 3D design vs built: trust early */}
-      <section className="bg-white"><div className="mx-auto grid max-w-[1440px] gap-12 px-5 py-14 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:px-10 lg:py-20">
-        <div className="reveal relative pb-14 pr-8 sm:pb-24 sm:pr-24">
-          <figure className="relative overflow-hidden rounded-[28px] bg-sand shadow-[0_30px_80px_-30px_rgba(14,19,17,.45)]">
-            <img src={imgSrc('3d-deck-design-rendering-second-storey-composite-deck-ottawa.webp')} alt="3D design rendering of a second-storey composite deck with black aluminum railing, lit stairs, privacy screen and under-deck storage in Ottawa" loading="lazy" className="aspect-[4/3] w-full object-cover" />
-            <figcaption className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-charcoal/85 px-3.5 py-1.5 text-[12px] font-semibold text-ivory backdrop-blur"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 2l9 5v10l-9 5-9-5V7z" /><path d="M12 22V12M21 7l-9 5-9-5" /></svg>3D design</figcaption>
-          </figure>
-          <span className="absolute bottom-[38%] right-[50%] z-10 hidden items-center gap-2 rounded-full bg-white px-3.5 py-2 text-[12px] font-semibold text-graphite shadow-lg sm:flex">Same project <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10m0 0L9 4m4 4l-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
-          <figure className="absolute bottom-0 right-0 w-[54%] overflow-hidden rounded-[22px] border-[6px] border-white shadow-[0_30px_60px_-25px_rgba(14,19,17,.55)]">
-            <img src={imgSrc(PHOTOS.storeyEnclosure.file)} alt="The finished deck built from the 3D design: second-storey composite deck with black aluminum railing and under-deck storage" loading="lazy" className="aspect-[4/3] w-full object-cover" />
-            <figcaption className="absolute left-3 top-3 rounded-full bg-bronze px-3 py-1 text-[11.5px] font-bold text-charcoal">Built by our crew</figcaption>
-          </figure>
-        </div>
-        <div className="reveal"><Eyebrow>Design before you build</Eyebrow><h2 className="mt-5 font-display text-[clamp(2.2rem,4.4vw,3.8rem)] font-semibold leading-[1.02] tracking-[-0.035em]">Visualize Your Deck Before You Build.</h2><p className="mt-6 max-w-lg text-[17px] leading-relaxed text-graphite/70">{viz}</p>
-          <ul className="mt-8 grid gap-3 sm:grid-cols-3">
-            {[['Measure', 'We measure your yard and photograph the site.', <path key="m" d="M3 17l14-14 4 4L7 21H3zM8 12l2 2M11 9l2 2M14 6l2 2" />], ['Design in 3D', 'See layout, materials and railings in 3D. Revise until it is right.', <path key="d" d="M12 2l9 5v10l-9 5-9-5V7zM12 22V12M21 7l-9 5-9-5" />], ['Build', 'Permits, materials and a crew that builds what you approved.', <path key="b" d="M3 21h18M5 21V10l7-6 7 6v11M9 21v-6h6v6" />]].map(([t, d, ic]: any) => (
-              <li key={t} className="rounded-2xl border border-graphite/10 bg-ivory p-4"><span className="grid h-9 w-9 place-items-center rounded-xl bg-charcoal text-bronze-light"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" aria-hidden="true">{ic}</svg></span><p className="mt-3 text-[15px] font-semibold">{t}</p><p className="mt-1 text-[13.5px] leading-snug text-graphite/60">{d}</p></li>
-            ))}
-          </ul>
-          <div className="mt-8 flex flex-wrap gap-3"><Btn to="/contacts#estimate" variant="dark">Book a design consultation <Arrow /></Btn><Btn to="/wellness/retreat-configurator" variant="outline">Try our 3D sauna designer</Btn></div></div>
-      </div></section>
       {/* 04 RESIDENTIAL SERVICES */}
       <section className="bg-ivory">
         <div className="mx-auto max-w-[1440px] px-5 py-14 lg:px-10 lg:py-20">
@@ -219,33 +191,37 @@ export function Home() {
         </div>
       </section>
 
-      {/* 07 MAP */}
-      <ShowroomMap legacyHeading="Deck & Fence Services Across Ottawa" />
-
-      {/* 08 LIVE FEED */}
-      <LiveFeed />
-
-      {/* 09 COMMERCIAL */}
-      <CommercialSpotlight />
-
-      {/* 10 BEFORE & AFTER */}
+      {/* 04b before/after + reels (same chapter: our work) */}
       <Transformations />
+      <Reels />
 
-      {/* 11 WELLNESS */}
-      <section className="wellness-band relative isolate overflow-hidden text-ivory">
-        {WELLP[0] ? <><div className="parallax absolute inset-0 -z-20" data-parallax><Media item={WELLP[0]} className="h-full w-full" /></div><div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#0f1714] via-[#0f1714]/75 to-transparent" /></> : <div className="panel-lines -z-10 opacity-40" aria-hidden="true" />}
-        <div className="mx-auto max-w-[1440px] px-5 py-28 lg:px-10 lg:py-40">
-          <Eyebrow light>ODP Wellness</Eyebrow>
-          <h2 className="reveal mt-5 max-w-3xl font-display text-[clamp(2.8rem,6.4vw,6rem)] font-light leading-[0.95] tracking-[-0.045em]">Your backyard.<br /><span className="text-sage-light">Your sanctuary.</span></h2>
-          <p className="reveal mt-6 max-w-lg text-[18px] leading-relaxed text-ivory/80">Beautifully designed outdoor saunas, cold plunges, and integrated wellness retreats.</p>
-          <div className="reveal mt-9 flex flex-wrap gap-3"><Btn to="/wellness/retreat-configurator" className="btn-sage">Design your retreat <Arrow /></Btn><Btn to="/wellness" variant="ghost-light">Explore ODP Wellness</Btn></div>
+      {/* 05 HOW IT WORKS: 3D design vs built + the 4 steps */}
+      <section className="bg-white" id="how-it-works"><div className="mx-auto max-w-[1440px] px-5 py-14 lg:px-10 lg:py-20">
+        <div className="reveal grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-end">
+          <div><Eyebrow>How it works</Eyebrow><h2 className="mt-5 font-display text-[clamp(2.2rem,4.4vw,3.8rem)] font-semibold leading-[1.02] tracking-[-0.035em]">Visualize Your Deck Before You Build.</h2></div>
+          <p className="max-w-lg text-[17px] leading-relaxed text-graphite/70 lg:justify-self-end">{viz}</p>
         </div>
-      </section>
-
-      {/* 12 PROJECT INSPIRATION */}
-      <ProjectWizard />
-
-      <Team />
+        <p className="reveal mt-10 text-center font-display text-[clamp(1.25rem,2.2vw,1.7rem)] font-semibold tracking-[-0.02em]">Same deck. <span className="text-graphite/45">Designed first,</span> <span className="text-bronze-dark">then built.</span></p>
+        <div className="vs-wrap reveal mt-6">
+          <figure className="vs-card vs-design">
+            <div className="vs-label"><span className="vs-num">1</span><span><b>The 3D design</b><small>What you approve</small></span></div>
+            <div className="vs-media"><img src={imgSrc('3d-deck-design-rendering-second-storey-composite-deck-ottawa.webp')} alt="3D design rendering of a second-storey composite deck with black aluminum railing, lit stairs, privacy screen and under-deck storage in Ottawa" loading="lazy" /><span className="vs-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 2l9 5v10l-9 5-9-5V7z" /><path d="M12 22V12M21 7l-9 5-9-5" /></svg>3D RENDER</span></div>
+          </figure>
+          <div className="vs-arrow" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></div>
+          <figure className="vs-card vs-built">
+            <div className="vs-label"><span className="vs-num">2</span><span><b>Built by our crew</b><small>What you get</small></span></div>
+            <div className="vs-media"><img src={imgSrc(PHOTOS.storeyEnclosure.file)} alt="The finished deck built from the 3D design: second-storey composite deck with black aluminum railing and under-deck storage" loading="lazy" /><span className="vs-badge"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10" /></svg>REAL PHOTO</span></div>
+          </figure>
+        </div>
+        <ol className="mt-10 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {[['Free consultation', 'We visit, measure your yard and talk through options.'], ['Design in 3D', 'See layout, materials and railings in 3D. Revise until it is right.'], ['Clear estimate', 'A straightforward proposal. No pressure, no surprises.'], ['Build', 'Permits, materials and a crew that builds what you approved.']].map(([t, d], i) => (
+            <li key={t} className="reveal rounded-2xl border border-graphite/10 bg-ivory p-5"><span className="font-display text-[13px] font-bold tracking-[0.18em] text-bronze-dark">STEP {i + 1}</span><p className="mt-2 text-[16px] font-semibold">{t}</p><p className="mt-1 text-[14px] leading-snug text-graphite/60">{d}</p></li>
+          ))}
+        </ol>
+        <div className="mt-8 flex flex-wrap justify-center gap-3"><Btn to="/contacts#estimate" variant="dark">Book a design consultation <Arrow /></Btn><Btn to="/wellness/retreat-configurator" variant="outline">Try our 3D sauna designer</Btn></div>
+      </div></section>
+      {/* 06 CREW */}
+      <Crew />
 
       {/* 14 REVIEWS */}
       {/* Trust: original copy + project stats, compact */}
@@ -263,12 +239,17 @@ export function Home() {
           </dl>
         </div>
       </section>
-      <Testimonials heading="HOW OUR CLIENTS DESCRIBE US" eyebrow="Real Client Testimonials" video={{ src: 'media/kanata-composite-deck-client-testimonial.mp4', preview: 'media/kanata-composite-deck-client-testimonial-preview.mp4', poster: 'kanata-composite-deck-client-testimonial.webp', caption: 'Client testimonial · Composite deck in Kanata', label: 'Kanata homeowners talk about their new composite deck with Ottawa Deck Pro' }} />
+      <Testimonials heading="HOW OUR CLIENTS DESCRIBE US" eyebrow="Real Client Testimonials" limit={10} allHref="/reviews" video={{ src: 'media/kanata-composite-deck-client-testimonial.mp4', preview: 'media/kanata-composite-deck-client-testimonial-preview.mp4', poster: 'kanata-composite-deck-client-testimonial.webp', caption: 'Client testimonial · Composite deck in Kanata', label: 'Kanata homeowners talk about their new composite deck with Ottawa Deck Pro' }} />
       <Brands heading="HIGH-PERFORMANCE MATERIALS FROM TRUSTED BRAND" />
 
-      {/* 15 FINAL CONVERSION */}
-      <MoreFaqs items={pickFaqs('/', [], 10)} heading="Answers before you build" dark />
-      <ProcessSteps />
+      {/* 08 FAQ */}
+      <MoreFaqs items={pickFaqs('/', [], 5)} heading="Answers before you build" dark />
+
+      {/* 09 SERVICE AREAS */}
+      <ShowroomMap legacyHeading="Deck & Fence Services Across Ottawa" />
+
+      {/* 10 ESTIMATE: wizard is step 1 */}
+      <ProjectWizard />
       <EstimateSection eyebrow="PLANNING YOUR 2026 DECK PROJECT?" sub="Limited spots available — book your project early! Choose residential, commercial or wellness and tell us about your project." photo={PHOTOS.multiLevel} />
     </Document>
   )
@@ -740,6 +721,24 @@ export function NotFound() {
           <a href="/" className="btn btn-primary mt-8">Back to home</a>
         </div>
       </section>
+    </Document>
+  )
+}
+
+export function Reviews() {
+  const trail: [string, string][] = [['Home', '/'], ['Reviews', '/reviews']]
+  const G = (settingsJson as any).googleRating
+  const meta: Meta = { title: `Ottawa Deck Pro Reviews | ${G.value} Stars from ${G.count} Google Reviews`, desc: `Read what Ottawa homeowners say about Ottawa Deck Pro. Rated ${G.value} out of 5 from ${G.count} Google reviews for decks, railings, fences and backyard makeovers.`, canonical: ORIGIN + '/reviews', extraLd: [crumbLd(trail)] }
+  return (
+    <Document meta={meta}>
+      <section className="bg-charcoal pb-14 pt-36 text-ivory lg:pt-44">
+        <div className="mx-auto max-w-[1440px] px-5 lg:px-10">
+          <Crumbs trail={trail} />
+          <p className="mt-8 eyebrow text-bronze-light">{G.value} stars · {G.count} Google reviews</p>
+        </div>
+      </section>
+      <Testimonials heading="Ottawa Deck Pro reviews" eyebrow="What our clients say" headingTag="h1" showAll video={{ src: 'media/kanata-composite-deck-client-testimonial.mp4', preview: 'media/kanata-composite-deck-client-testimonial-preview.mp4', poster: 'kanata-composite-deck-client-testimonial.webp', caption: 'Client testimonial · Composite deck in Kanata', label: 'Kanata homeowners talk about their new composite deck with Ottawa Deck Pro' }} />
+      <EstimateSection eyebrow="READY WHEN YOU ARE" sub="Tell us about your project and we will get back to you within 1 business day." photo={PHOTOS.multiLevel} />
     </Document>
   )
 }

@@ -19,7 +19,7 @@ import { execSync } from 'node:child_process'
 import metaJson from '../content/meta.json'
 import { CTX } from './lib'
 import { ORIGIN } from './site'
-import { ExistingPage, Home, Gallery, Faq, Contacts, BlogIndex, Post, ServiceAreas, Wellness, Commercial, WellnessProduct, PRODUCTS, NotFound } from './pages'
+import { ExistingPage, Home, Gallery, Faq, Contacts, BlogIndex, Post, ServiceAreas, Wellness, Commercial, WellnessProduct, PRODUCTS, NotFound, Reviews } from './pages'
 
 const preview = process.argv.includes('--preview')
 const OUT = path.resolve(preview ? 'preview' : 'dist')
@@ -38,7 +38,8 @@ for (const p of existing) {
   else routes.push([p, () => <ExistingPage path={p} />])
 }
 if (existing.includes('/commercial-deck-construction')) throw new Error('URL conflict: /commercial-deck-construction already exists')
-routes.push(['/service-areas', () => <ServiceAreas />], ['/wellness', () => <Wellness />], ['/commercial-deck-construction', () => <Commercial />])
+if (existing.includes('/reviews')) throw new Error('URL conflict: /reviews already exists')
+routes.push(['/reviews', () => <Reviews />], ['/service-areas', () => <ServiceAreas />], ['/wellness', () => <Wellness />], ['/commercial-deck-construction', () => <Commercial />])
 for (const p of PRODUCTS) routes.push(['/wellness/products/' + p.slug, () => <WellnessProduct p={p} />])
 
 fs.rmSync(OUT, { recursive: true, force: true })

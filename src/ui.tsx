@@ -336,11 +336,14 @@ export function StatsBand({ dark = false }: { dark?: boolean }) {
 const Stars = ({ size = 15 }: { size?: number }) => <span className="stars inline-flex" aria-label="5 out of 5 stars">{[0, 1, 2, 3, 4].map((i) => <svg key={i} width={size} height={size} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5l2.6 5.5 6 .7-4.4 4.1 1.2 5.9L10 14.8l-5.4 2.9 1.2-5.9L1.4 7.7l6-.7z" /></svg>)}</span>
 
 /* Review collage: Google rating summary, real client reviews, the client video and real project photos */
-export function Testimonials({ heading, eyebrow, noVideo = false, video }: { heading?: string; eyebrow?: string; noVideo?: boolean; video?: { src: string; preview: string; poster: string; caption: string; label: string } }) {
+export function Testimonials({ heading, eyebrow, noVideo = false, video, limit, allHref, showAll = false, headingTag = 'h2' }: { heading?: string; eyebrow?: string; noVideo?: boolean; video?: { src: string; preview: string; poster: string; caption: string; label: string }; limit?: number; allHref?: string; showAll?: boolean; headingTag?: 'h1' | 'h2' }) {
   const V = video || { src: 'media/testimonial-reel.mp4', preview: 'media/testimonial-preview.mp4', poster: 'ottawa-deck-pro-client-testimonial.webp', caption: 'Client testimonial · Ottawa Deck Pro on Instagram', label: 'Client video testimonial' }
-  const R = ((reviewsJson as any).items as any[]).map((r) => ({ ...r, area: r.area || (TESTIMONIALS.find((t) => t.name === r.name) || ({} as any)).area || '' })) // every written review from the Google listing
+  const ALL = ((reviewsJson as any).items as any[]).map((r) => ({ ...r, area: r.area || (TESTIMONIALS.find((t) => t.name === r.name) || ({} as any)).area || '' })) // every written review from the Google listing
+  // homepage: the original site testimonials first, then the newest Google reviews
+  const R = limit ? [...ALL.filter((r) => TESTIMONIALS.some((t) => t.name === r.name)), ...ALL.filter((r) => !TESTIMONIALS.some((t) => t.name === r.name))].slice(0, limit) : ALL
   const G = (settingsJson as any).googleRating
-  const FIRST = 14
+  const FIRST = showAll || limit ? R.length : 14
+  const H = headingTag
   const photo = (p: Photo) => <figure key={p.file} className="rv-tile rv-photo reveal"><Img photo={p} sizes="(min-width:1024px) 25vw, 50vw" /><figcaption>Built by Ottawa Deck Pro</figcaption></figure>
   const text = (t: any, i: number) => (
     <figure key={t.name + i} className={`rv-tile rv-text ${t.photos ? 'rv-has-photo' : ''} ${i >= FIRST ? 'rv-extra' : 'reveal'}`}>
@@ -376,11 +379,11 @@ export function Testimonials({ heading, eyebrow, noVideo = false, video }: { hea
     <section className="bg-sand" id="reviews" data-rv>
       <div className="mx-auto max-w-[1440px] px-5 py-14 lg:px-10 lg:py-20">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div><Eyebrow>{eyebrow || 'Client reviews'}</Eyebrow><h2 className="mt-4 font-display text-[clamp(2rem,4vw,3.25rem)] font-semibold leading-tight tracking-[-0.03em]">{heading || 'How our clients describe us'}</h2></div>
+          <div><Eyebrow>{eyebrow || 'Client reviews'}</Eyebrow><H className="mt-4 font-display text-[clamp(2rem,4vw,3.25rem)] font-semibold leading-tight tracking-[-0.03em]">{heading || 'How our clients describe us'}</H></div>
           <a href={(settingsJson as any).googleReviewsUrl} target="_blank" rel="noopener" className="flex items-center gap-3 text-[15px] text-graphite/65 hover:text-graphite"><Stars /><span><b className="font-semibold text-graphite">{G.value}</b> · {G.count} Google reviews</span></a>
         </div>
         <div className="rv-grid mt-12">{tiles}</div>
-        {R.length > FIRST ? <div className="mt-6 text-center"><button type="button" className="btn btn-outline" data-rv-more>Show all {R.length} written reviews</button></div> : null}
+        {allHref ? <div className="mt-8 text-center"><a href={href(allHref)} className="btn btn-dark">See all {G.count} reviews <Arrow /></a></div> : R.length > FIRST ? <div className="mt-6 text-center"><button type="button" className="btn btn-outline" data-rv-more>Show all {R.length} written reviews</button></div> : null}
         <FoundOn />
       </div>
     </section>

@@ -183,5 +183,6 @@ export const NAV = [
 export const COMMERCIAL_STOCK = {
   rooftopNight: { src: 'commercial-rooftop-patio-deck-construction-ottawa.webp', alt: 'Rooftop patio deck with string lights, lounge seating and dining tables at night', source: 'stock', category: 'commercial' },
   condoRooftop: { src: 'condo-rooftop-amenity-deck-ottawa.webp', alt: 'Condominium rooftop amenity deck with lounge furniture and city skyline', source: 'stock', category: 'commercial' },
+  multiUnitReal: { src: 'multi-unit-townhouse-pressure-treated-decks-privacy-fence-ottawa.webp', alt: 'Multi-unit townhouse project in Ottawa: row of pressure-treated wood decks with matching privacy fences built by Ottawa Deck Pro', source: 'real', category: 'commercial' },
   multiUnitTerrace: { src: 'multi-unit-rooftop-terrace-deck-ottawa.webp', alt: 'Multi-unit building rooftop terrace with outdoor kitchen, dining set and planters', source: 'stock', category: 'commercial' },
 }
