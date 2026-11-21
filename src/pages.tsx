@@ -12,6 +12,7 @@ import { pickFaqs, toQA, MoreFaqs, FaqLibrary, FAQS, FAQ_TOTAL, type Faq } from 
 const withFaqs = (path: string, n = 8, existing: string[] = []) => { const items = pickFaqs(path, existing, n); return { items, ld: items.length ? [faqLd(toQA(items))] : [] } }
 import settingsJson from '../content/collections/settings.json'
 import { DecksPage, RailingsPage, StainingPage, FencesPage } from './service'
+import { loadPosts } from './blog'
 const SETTINGS = settingsJson as any
 import wellnessPhotosRaw from '../content/collections/wellnessPhotos.json'
 const WELLP = [...(wellnessPhotosRaw as any).items].sort((a: any, b: any) => (a.source === 'actual' ? 0 : 1) - (b.source === 'actual' ? 0 : 1))
@@ -404,6 +405,12 @@ export function BlogIndex() {
       </section>
       <section className="bg-ivory">
         <div className="mx-auto grid max-w-[1440px] gap-6 px-5 py-14 md:grid-cols-2 lg:grid-cols-3 lg:px-10">
+          {loadPosts(CTX.preview).map((bp) => (
+            <a key={bp.path} href={href(bp.path)} className="card reveal group">
+              <div className="card-media relative"><img src={imgSrc(bp.cover)} alt={bp.coverAlt} loading="lazy" />{bp.status !== 'published' ? <span className="absolute left-3 top-3 rounded-full bg-[#F4C430] px-2.5 py-1 text-[11px] font-bold uppercase text-charcoal">Draft</span> : null}</div>
+              <div className="p-7"><p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-bronze-dark">{bp.category}</p><h2 className="mt-2 font-display text-[21px] font-bold leading-snug tracking-tight group-hover:text-bronze-dark">{bp.h1}</h2><p className="mt-3 line-clamp-3 text-[15px] text-graphite/65">{bp.description}</p></div>
+            </a>
+          ))}
           {POSTS.map((p, i) => {
             const bl = B[p] || []; const h1 = bl.find((b) => b.t === 'h1')?.x || M[p].title
             const first = bl.find((b) => b.t === 'p')?.x || ''

@@ -20,6 +20,7 @@ import { execSync } from 'node:child_process'
 import metaJson from '../content/meta.json'
 import { CTX } from './lib'
 import { ORIGIN } from './site'
+import { loadPosts, NewPost } from './blog'
 import { ExistingPage, Home, Gallery, Faq, Contacts, BlogIndex, Post, ServiceAreas, Wellness, Commercial, WellnessProduct, PRODUCTS, NotFound, Reviews } from './pages'
 
 const preview = process.argv.includes('--preview')
@@ -42,6 +43,8 @@ for (const p of existing) {
 if (existing.includes('/commercial-deck-construction')) throw new Error('URL conflict: /commercial-deck-construction already exists')
 if (existing.includes('/reviews')) throw new Error('URL conflict: /reviews already exists')
 routes.push(['/reviews', () => <Reviews />], ['/service-areas', () => <ServiceAreas />], ['/wellness', () => <Wellness />], ['/commercial-deck-construction', () => <Commercial />])
+// new blog posts (drafts only in preview builds)
+for (const bp of loadPosts(preview)) { if (existing.includes(bp.path)) throw new Error('URL conflict: ' + bp.path); routes.push([bp.path, () => <NewPost post={bp} />]) }
 for (const p of PRODUCTS) routes.push(['/wellness/products/' + p.slug, () => <WellnessProduct p={p} />])
 
 // never publish placeholder prices: every calculator range must be confirmed by the owner

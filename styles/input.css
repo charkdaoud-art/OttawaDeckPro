@@ -415,3 +415,13 @@ p { text-wrap: pretty; }
 .rail-swatches img { aspect-ratio: 4/3; border-radius: 12px; background: #111; padding: 6px; }
 .rail-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .rail-photos img { aspect-ratio: 1; border-radius: 12px; }
+
+/* new blog posts */
+.post-body > h2:first-child { margin-top: 0; }
+.post-body h2 { scroll-margin-top: 110px; }
+.post-body a { color: #3f6f24; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.post-body ul li::marker { color: #7CBC42; }
+.post-figure { margin: 2.2em 0; }
+.post-figure img { margin: 0; width: 100%; border-radius: 22px; aspect-ratio: 16/10; object-fit: cover; box-shadow: 0 30px 70px -40px rgba(14,19,17,.55); }
+.post-figure figcaption { margin-top: 10px; font-size: 14px; color: rgba(32,37,42,.55); }
+.post-callout { margin: 2em 0; padding: 22px 26px; border-radius: 20px; background: #EEF6E6; border-left: 5px solid #7CBC42; font-size: 18px; line-height: 1.7; color: #20252A; }

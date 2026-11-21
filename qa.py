@@ -11,6 +11,11 @@ REMOVED = {'real ottawa projects', 'under $20k deck samples', '$20k – $40k dec
 SKIP_TEXT = re.compile(r'^(email|phone|address|timing|text)\s*:|^\*|^instant quote|^shop$|^submit$|^\[\]', re.I)
 rows = []; all_ok = True
 pages = set(p for p in M if p not in REDIRECTS) | {'/service-areas', '/wellness', '/wellness/retreat-configurator', '/commercial-deck-construction', '/reviews'}
+# new blog posts (content/posts/*.md, published only)
+for _f in (os.listdir('content/posts') if os.path.isdir('content/posts') else []):
+    _t = open(os.path.join('content/posts', _f)).read() if _f.endswith('.md') else ''
+    _m = re.search(r'^slug:\s*(\S+)', _t, re.M)
+    if _m and re.search(r'^status:\s*published', _t, re.M): pages.add('/post/' + _m.group(1))
 broken = set()
 for p in sorted(M):
     r = {'url': p}

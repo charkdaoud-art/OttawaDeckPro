@@ -31,4 +31,6 @@ Static React SSR + Tailwind rebuild of the old Wix site. Every Wix URL, title, m
 - $5,000 offer condition ($40k+ signed projects) stays visible as small print, not hidden.
 - Ask before changing DNS or anything that affects the live site.
 
+- Blog: content/posts/*.md rendered by src/blog.tsx (status draft = preview only + noindex; published = live + sitemap). Daily 7 AM draft task follows docs/BLOG-GUIDE.md; owner approves each post before it goes live.
+
 See DEV-HANDOFF.md for the go-live checklist and README.md for file layout.
