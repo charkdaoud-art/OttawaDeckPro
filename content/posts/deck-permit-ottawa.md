@@ -8,7 +8,7 @@ cover: deck-framing-construction-ottawa.webp
 coverAlt: Deck framing in progress on a bungalow in Ottawa
 keyword: deck permit Ottawa
 category: Permits & code
-status: draft
+status: published
 ---
 It is the first question on a lot of our consultations: **do I need a deck permit in Ottawa?** The short answer is that it depends on two things. How high the deck sits above the ground, and whether it is attached to your house.
 
