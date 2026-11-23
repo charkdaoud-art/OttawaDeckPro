@@ -348,7 +348,7 @@ export function ProjectWizard() {
         <ol className="wiz-steps" aria-label="Steps"><li data-step-dot="1" className="on">Select</li><li data-step-dot="2">Options</li><li data-step-dot="3">Inspiration</li><li data-step-dot="4">Estimate</li></ol>
         <div data-step="1">
           <div className="grid gap-4 md:grid-cols-3">
-            {[['residential', 'Luxury Residential Deck', { src: PHOTOS.whiteRailRear.file, alt: PHOTOS.whiteRailRear.alt, source: 'actual', category: 'residential' }], ['commercial', 'Commercial / Multi-Unit Project', C[0]], ['wellness', 'Outdoor Wellness', { src: 'modern-outdoor-sauna-cabin-winter-wellness-ottawa.webp', alt: 'Modern outdoor sauna cabin glowing in the snow at dusk', source: 'stock', category: 'wellness' }]].map(([k, l, im]: any) => (
+            {[['residential', 'Luxury Residential Deck', { src: PHOTOS.loungeBalcony.file, alt: PHOTOS.loungeBalcony.alt, source: 'actual', category: 'residential' }], ['commercial', 'Commercial / Multi-Unit Project', CS.multiUnitReal], ['wellness', 'Outdoor Wellness', WELL[1]]].map(([k, l, im]: any) => (
               <button key={k} type="button" className="wiz-type group" data-wiz-type={k}>{im ? <Media item={im} className="aspect-[4/3]" imgClass="transition duration-700 group-hover:scale-105" sizes="33vw" /> : <Panel kind={k} className="aspect-[4/3]" />}<span className="block p-5 text-left font-display text-[19px] font-semibold tracking-tight">{l}</span></button>
             ))}
           </div>

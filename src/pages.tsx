@@ -145,8 +145,23 @@ export function Home() {
 
       <TrustBar />
 
-      {/* 03 WHAT WE BUILD: divisions + services */}
-      <Divisions />
+      {/* 06 FEATURED PROJECTS */}
+      <section className="bg-ivory">
+        <div className="mx-auto max-w-[1440px] px-5 py-14 lg:px-10 lg:py-20">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div><Eyebrow>REAL OTTAWA PROJECTS</Eyebrow><h2 className="mt-4 font-display text-[clamp(2.2rem,4.6vw,4rem)] font-bold tracking-tight">OUR PROJECTS</h2></div>
+            <Btn to="/gallery" variant="outline">View our projects <Arrow /></Btn>
+          </div>
+          <div className="mt-10 grid grid-flow-dense auto-rows-[220px] grid-cols-2 gap-3 md:auto-rows-[260px] md:grid-cols-4">
+            {projects.map((p, i) => (
+              <a key={p.file} href={href('/gallery')} className={`reveal group overflow-hidden rounded-2xl ${i === 0 ? 'col-span-2 row-span-2' : i === 4 ? 'row-span-2' : ''}`}>
+                <Img photo={p} className="h-full w-full object-cover transition duration-[1.2s] group-hover:scale-[1.05]" sizes="(min-width:768px) 25vw, 50vw" />
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 04 RESIDENTIAL SERVICES */}
       <section className="bg-ivory">
         <div className="mx-auto max-w-[1440px] px-5 py-14 lg:px-10 lg:py-20">
@@ -172,26 +187,13 @@ export function Home() {
       </section>
 
 
-      {/* 06 FEATURED PROJECTS */}
-      <section className="bg-ivory">
-        <div className="mx-auto max-w-[1440px] px-5 py-14 lg:px-10 lg:py-20">
-          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-            <div><Eyebrow>REAL OTTAWA PROJECTS</Eyebrow><h2 className="mt-4 font-display text-[clamp(2.2rem,4.6vw,4rem)] font-bold tracking-tight">OUR PROJECTS</h2></div>
-            <Btn to="/gallery" variant="outline">View our projects <Arrow /></Btn>
-          </div>
-          <div className="mt-10 grid grid-flow-dense auto-rows-[220px] grid-cols-2 gap-3 md:auto-rows-[260px] md:grid-cols-4">
-            {projects.map((p, i) => (
-              <a key={p.file} href={href('/gallery')} className={`reveal group overflow-hidden rounded-2xl ${i === 0 ? 'col-span-2 row-span-2' : i === 4 ? 'row-span-2' : ''}`}>
-                <Img photo={p} className="h-full w-full object-cover transition duration-[1.2s] group-hover:scale-[1.05]" sizes="(min-width:768px) 25vw, 50vw" />
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 04b before/after + reels (same chapter: our work) */}
+      {/* before/after */}
       <Transformations />
-      <Reels />
+      {/* mid-page estimate nudge */}
+      <div className="mid-cta bg-white"><div className="mx-auto flex max-w-[1440px] flex-col items-center justify-center gap-3 px-5 pb-4 pt-2 text-center sm:flex-row sm:gap-5 lg:px-10">
+        <p className="text-[16px] font-medium text-graphite/70">Like what you see? Let's talk about your backyard.</p>
+        <Btn to="/contacts#estimate">Get a free estimate <Arrow /></Btn>
+      </div></div>
 
       {/* 05 HOW IT WORKS: 3D design vs built + the 4 steps */}
       <section className="bg-white" id="how-it-works"><div className="mx-auto max-w-[1440px] px-5 py-14 lg:px-10 lg:py-20">
@@ -218,6 +220,9 @@ export function Home() {
         </ol>
         <div className="mt-8 flex flex-wrap justify-center gap-3"><Btn to="/contacts#estimate" variant="dark">Book a design consultation <Arrow /></Btn><Btn to="/wellness/retreat-configurator" variant="outline">Try our 3D sauna designer</Btn></div>
       </div></section>
+      {/* reels */}
+      <Reels />
+
       {/* 06 CREW */}
       <Crew />
 
