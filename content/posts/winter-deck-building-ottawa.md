@@ -8,7 +8,7 @@ cover: modern-outdoor-sauna-cabin-winter-wellness-ottawa.webp
 coverAlt: Snow-covered backyard in winter with a lit outdoor sauna near Ottawa
 keyword: winter deck building Ottawa
 category: Seasons & timing
-status: draft
+status: published
 ---
 Snow is on the way, and a lot of homeowners ask us the same thing this time of year: **can you build a deck in winter in Ottawa?** The short answer is that winter deck building in Ottawa is possible, but the cold changes how the work is done. Frozen ground, short days and building code rules all play a part.
 
