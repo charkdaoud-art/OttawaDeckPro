@@ -82,7 +82,7 @@ window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
 
 /* ---------- header ---------- */
 function Header() {
-  return (
+  return (<>
     <header className="site-header" data-header>
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between gap-6 px-5 lg:h-[84px] lg:px-10">
         <a href={href('/')} aria-label="Ottawa Deck Pro home" className="shrink-0"><Logo /></a>
@@ -117,31 +117,31 @@ function Header() {
           </button>
         </div>
       </div>
-      <div className="mobile-menu" data-menu hidden>
-        <div className="flex h-[72px] items-center justify-between px-5">
-          <Logo inverse />
-          <button className="text-ivory" aria-label="Close menu" data-menu-close>
-            <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M7 7l14 14M21 7L7 21" stroke="currentColor" strokeWidth="1.6" /></svg>
-          </button>
-        </div>
-        <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-6 pb-10 pt-4">
-          <a href={href('/')} className="m-link">Home</a>
-          {NAV.map((n) => n.items ? (
-            <details key={n.label} className="m-group">
-              <summary className="m-link">{n.label}</summary>
-              <div className="pb-4 pl-1">
-                {n.items.map((it) => <a key={it.label} href={href(it.href)} className="block py-2.5 text-[17px] text-ivory/75">{it.label}</a>)}
-              </div>
-            </details>
-          ) : <a key={n.label} href={href(n.href)} className="m-link">{n.label}</a>)}
-          <div className="mt-10 space-y-3">
-            <Btn to="/contacts#estimate" className="w-full justify-center">Get a free estimate</Btn>
-            <a href={BRAND.phoneHref} className="btn btn-ghost-light w-full justify-center" data-track="phone">Call {BRAND.phone}</a>
-          </div>
-        </nav>
-      </div>
     </header>
-  )
+      <div className="mobile-menu" data-menu hidden>
+      <div className="flex h-[72px] items-center justify-between px-5">
+        <Logo inverse />
+        <button className="text-ivory" aria-label="Close menu" data-menu-close>
+          <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M7 7l14 14M21 7L7 21" stroke="currentColor" strokeWidth="1.6" /></svg>
+        </button>
+      </div>
+      <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-6 pb-10 pt-4">
+        <a href={href('/')} className="m-link">Home</a>
+        {NAV.map((n) => n.items ? (
+          <details key={n.label} className="m-group">
+            <summary className="m-link">{n.label}</summary>
+            <div className="pb-4 pl-1">
+              {n.items.map((it) => <a key={it.label} href={href(it.href)} className="block py-2.5 text-[17px] text-ivory/75">{it.label}</a>)}
+            </div>
+          </details>
+        ) : <a key={n.label} href={href(n.href)} className="m-link">{n.label}</a>)}
+        <div className="mt-10 space-y-3">
+          <Btn to="/contacts#estimate" className="w-full justify-center">Get a free estimate</Btn>
+          <a href={BRAND.phoneHref} className="btn btn-ghost-light w-full justify-center" data-track="phone">Call {BRAND.phone}</a>
+        </div>
+      </nav>
+    </div>
+  </>)
 }
 
 /* ---------- footer ---------- */
