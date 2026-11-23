@@ -21,7 +21,7 @@ Frontmatter (all required): title (<= 60 chars, ends "| Ottawa Deck Pro"), descr
 Body:
 - 1,200 to 1,800 words. Keyword in the first 100 words, in at least two H2s and in the slug.
 - Intro (2 short paragraphs), 5 to 8 H2 sections, ### subsections where useful, bullet lists, one "> " callout with the key takeaway.
-- 3 to 5 photos: `![alt](file.webp "caption")` using only files from the list below. Use a different cover than the last 5 posts.
+- 3 to 5 photos: `![alt](file.webp "caption")`. Photos must match the topic (owner, Nov 23: a winter post shows snow). Never reuse a photo (cover or body) that any other post in content/posts/ already uses; grep the posts first. Start from the list below, then any other file in public/img. If nothing fits, use a free-licence stock photo (Unsplash License, Pexels, or Wikimedia Commons CC0/CC BY, with credit in the caption if required), saved as .webp with an SEO file name in public/img. Never caption a stock photo as our work. If no fitting photo can be found or downloaded, say so in the owner message and ask for his photos.
 - 4+ internal links to real pages: /decks, /decks#calculator, /railings, /staining, /fences, /backyard-makeover, /wellness, /commercial-deck-construction, /reviews, /gallery, /contacts#estimate, and city pages like /composite-deck-kanata, /deck-builder-barrhaven, /aluminum-railing-orleans, /glass-railing-manotick, /pvc-deck-stittsville (check the URL exists in content/meta.json).
 - A short "Why Ottawa Deck Pro" section using only the allowed facts, ending with a link to /contacts#estimate.
 - End with "## Frequently asked questions" and 4 to 6 "### Question" + answer pairs (answers 1 to 3 sentences).

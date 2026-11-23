@@ -4,8 +4,8 @@ description: Winter deck building in Ottawa explained: frozen ground, footings, 
 h1: Can You Build a Deck in Winter in Ottawa?
 slug: winter-deck-building-ottawa
 date: 2026-11-23
-cover: composite-deck-evening-lighting-ottawa.webp
-coverAlt: Composite deck with black railing lit in the evening in Ottawa
+cover: modern-outdoor-sauna-cabin-winter-wellness-ottawa.webp
+coverAlt: Snow-covered backyard in winter with a lit outdoor sauna near Ottawa
 keyword: winter deck building Ottawa
 category: Seasons & timing
 status: draft
@@ -14,7 +14,7 @@ Snow is on the way, and a lot of homeowners ask us the same thing this time of y
 
 This guide explains what really happens when you build in the cold. How footings and frozen soil work, what the City checks, how composite boards behave below freezing, and why winter is often the best season to plan and design. Rules can change, so always confirm your own project with the City.
 
-![Large deck under construction behind a two-storey home in Ottawa](large-deck-construction-ottawa.webp "The foundation and framing stages are where cold weather matters most.")
+![Deck framing in progress by the water near Ottawa](waterfront-deck-framing-ottawa.webp "Framing goes up fast. In winter, the foundation under it is what takes the most care.")
 
 ## Winter deck building in Ottawa: the short answer
 
@@ -56,6 +56,8 @@ The permit rules do not change with the seasons. The City of Ottawa requires a b
 
 A permitted deck has three City inspections:
 
+![Deck framing plan drawing for an Ottawa building permit](ottawa-deck-permit-framing-plan.webp "A framing plan like this one is part of a deck permit application, and it can be prepared over the winter.")
+
 1. **Foundations,** before backfill, to confirm the footings match the code and your plans.
 2. **Framing,** when the structure and guards are complete.
 3. **Final,** when the framing, stairs and guards are done.
@@ -74,7 +76,7 @@ Composite boards expand and contract with temperature, more along their length t
 
 Every brand has its own guide, and we follow the installation guide for the exact product on your deck. Get the gaps wrong in the cold and boards can buckle in July.
 
-![Grey composite deck with black aluminum railing in Ottawa](grey-composite-deck-black-aluminum-railing-ottawa.webp "Composite boards are fine in the cold once they are installed with the right gaps.")
+![Fastening composite deck boards on an Ottawa deck](mike-installing-composite-decking-ottawa.webp "Board gaps depend on the temperature on install day. Our crew follows the manufacturer's guide.")
 
 ### What about wood decks?
 
@@ -103,7 +105,7 @@ For many Ottawa homeowners, the best use of winter is planning. Here is what you
 3. **Sort out the permit.** If your deck needs one, plans and the permit application can be prepared over the winter.
 4. **Set your budget.** Use our [deck cost calculator](/decks#calculator) for a quick range.
 
-![Composite deck with picture frame border and lit cascading stairs in Ottawa](composite-deck-picture-frame-border-lit-stairs-ottawa.webp "Designed over the winter, built and enjoyed all summer.")
+![Second-storey composite deck with black aluminum railing, lit stairs and under-deck storage in Ottawa](3d-deck-design-rendering-second-storey-composite-deck-ottawa.webp "Plan it over the winter, enjoy it all summer.")
 
 ## What does a deck cost in Ottawa?
 
