@@ -8,7 +8,7 @@ cover: stittsville-backyard-deck-design.webp
 coverAlt: Raised deck with black railing on a brick home in summer in Ottawa
 keyword: best time to build a deck Ottawa
 category: Seasons & timing
-status: draft
+status: published
 ---
 Most people start thinking about a deck on the first warm weekend of the year. That is natural, but it is rarely the **best time to build a deck in Ottawa**. By then, the design, the permit and the build itself all still have to happen, and summer is already on its way.
 
