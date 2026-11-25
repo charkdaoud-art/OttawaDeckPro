@@ -8,7 +8,7 @@ cover: 3d-deck-design-black-aluminum-railing-ottawa.webp
 coverAlt: 3D design of a new grey deck with black aluminum railing and lit stairs for an Ottawa home
 keyword: deck estimate Ottawa
 category: Pricing
-status: draft
+status: published
 ---
 Asking for a **deck estimate in Ottawa** can feel like a gamble. Some quotes arrive as one line on an email. Others take weeks. And very few show you what you are actually paying for.
 

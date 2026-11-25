@@ -8,7 +8,7 @@ cover: composite-deck-black-aluminum-railing-ottawa.webp
 coverAlt: Long composite deck with black aluminum railing across the back of an Ottawa home
 keyword: composite deck cost per square foot Ottawa
 category: Pricing
-status: draft
+status: published
 ---
 If you are pricing a new deck, one number comes up first: **composite deck cost per square foot in Ottawa.** In 2026, a composite deck we build typically runs about **$65 to $100+ per square foot installed, before tax.** That covers the frame, the footings, the decking and the labour.
 
