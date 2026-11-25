@@ -1,5 +1,5 @@
 ﻿url,status,title_match,desc_match,canonical_match,h1_match,h1_original,h1_new,text_blocks,text_missing,coverage,links_original,links_missing,images_original,images_rehosted,missing_sample
-/,200,True,True,True,True,ottawa's trusted deck & railing experts. / looking for a simpler starting option?,ottawa's trusted deck & railing experts.,36,0,100.0%,6,,42,19,
+/,200,True,True,True,True,ottawa's trusted deck & railing experts. / looking for a simpler starting option?,ottawa's trusted deck & railing experts.,35,0,100.0%,6,,42,19,
 /aluminum-railing-arnprior,200,True,True,True,True,aluminum railing in arnprior,aluminum railing in arnprior,56,0,100.0%,5,,21,14,
 /aluminum-railing-barrhaven,200,True,True,True,True,aluminum railing in barrhaven,aluminum railing in barrhaven,56,0,100.0%,5,,21,14,
 /aluminum-railing-bells-corners,200,True,True,True,True,aluminum railing in bells corners,aluminum railing in bells corners,56,0,100.0%,5,,21,14,
@@ -67,7 +67,7 @@
 /deck-builder-westboro,200,True,True,True,True,deck builder in westboro,deck builder in westboro,59,0,100.0%,5,,25,18,
 /deck-packages,301 → /decks,,,,,,,,,,,,,,
 /deck-repair-kanata,200,True,True,True,True,deck repair in kanata,deck repair in kanata,53,0,100.0%,5,,17,10,
-/decks,200,True,True,True,False,looking for a simpler starting option?,custom decks,39,0,100.0%,6,,25,21,
+/decks,200,True,True,True,False,looking for a simpler starting option?,custom decks,38,0,100.0%,6,,25,21,
 /faq,200,True,True,True,True,frequently asked questions,frequently asked questions,52,0,100.0%,0,,1,0,
 /fences,200,True,True,True,True,custom fences,custom fences,21,0,100.0%,1,,11,11,
 /gallery,200,True,True,True,False,,see what we've built across ottawa.,16,0,100.0%,20,,32,14,
