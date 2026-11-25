@@ -182,7 +182,7 @@ export function DecksPage({ metaFor }: { metaFor: (p: string, ld?: object[]) => 
           <ul className="mt-7 grid gap-3 sm:grid-cols-2">{[29, 30, 31, 32, 33, 34].map((i) => <li key={i} className="flex items-start gap-3 rounded-2xl bg-white p-4 text-[15px] font-medium"><span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-bronze text-charcoal"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10" /></svg></span>{x(path, i)}</li>)}</ul>
           <p className="mt-7 text-[16px] leading-relaxed text-graphite/70"><Inline text={x(path, 16)} /></p>
         </div>
-        <figure className="reveal overflow-hidden rounded-[28px] shadow-[0_30px_80px_-30px_rgba(14,19,17,.45)]"><Img photo={PHOTOS.luxuryCovered} className="aspect-[4/5] w-full object-cover" sizes="(min-width:1024px) 45vw, 100vw" /></figure>
+        <figure className="reveal overflow-hidden rounded-[28px] shadow-[0_30px_80px_-30px_rgba(14,19,17,.45)]"><img src={imgSrc('mike-installing-composite-decking-ottawa.webp')} alt="Mike, team lead at Ottawa Deck Pro, fastening composite deck boards on an Ottawa project" loading="lazy" className="aspect-[4/5] w-full object-cover" /></figure>
       </div></section>
 
       <Transformations />

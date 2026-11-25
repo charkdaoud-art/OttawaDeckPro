@@ -7,7 +7,7 @@ def page_file(p): return os.path.join(DIST, 'index.html' if p == '/' else p.stri
 def norm(t): t = re.sub(r'\[([^\]]*)\]\([^)]+\)', r'\1', t or ''); t = t.replace('​', '').replace('’', "'").replace('‘', "'").replace('“', '"').replace('”', '"'); t = re.sub(r'(^|\s)[-•]\s', ' ', t); return re.sub(r'\s+', ' ', t).strip().lower()
 REDIRECTS = {'/copy-of-pvc-deck-carp': '/pvc-deck-carp', '/deck-packages': '/decks'}
 # text the owner chose to remove (deck packages and /decks budget tiers dropped Nov 21 2026)
-REMOVED = {'real ottawa projects', 'under $20k deck samples', '$20k – $40k deck samples', '$40k – $60k deck samples', '$60k – $90k deck samples', '$90k+ deck samples', 'looking for a simpler starting option?', 'explore our professionally designed floating deck packages with transparent starting pricing.'}
+REMOVED = {'real ottawa projects', 'under $20k deck samples', '$20k – $40k deck samples', '$40k – $60k deck samples', '$60k – $90k deck samples', '$90k+ deck samples', 'looking for a simpler starting option?', 'explore our professionally designed floating deck packages with transparent starting pricing.', 'before & after — the transformation.'}  # last one: em dash removed, owner approved Nov 25
 SKIP_TEXT = re.compile(r'^(email|phone|address|timing|text)\s*:|^\*|^instant quote|^shop$|^submit$|^\[\]', re.I)
 rows = []; all_ok = True
 pages = set(p for p in M if p not in REDIRECTS) | {'/service-areas', '/wellness', '/wellness/retreat-configurator', '/commercial-deck-construction', '/reviews'}

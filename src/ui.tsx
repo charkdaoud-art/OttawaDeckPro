@@ -89,7 +89,7 @@ function Header() {
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between gap-6 px-5 lg:h-[84px] lg:px-10">
         <a href={href('/')} aria-label="Ottawa Deck Pro home" className="shrink-0"><Logo /></a>
         <nav aria-label="Main" className="hidden xl:block">
-          <ul className="flex items-center gap-1 text-[14px] font-semibold">
+          <ul className="flex items-center gap-0 text-[13.5px] font-semibold 2xl:gap-1 2xl:text-[14px]">
             {NAV.map((n) => (
               <li key={n.label} className="nav-item">
                 <a href={href(n.href)} className="nav-link" aria-haspopup={n.items ? 'true' : undefined}>
@@ -112,8 +112,8 @@ function Header() {
           </ul>
         </nav>
         <div className="flex items-center gap-3">
-          <a href={BRAND.phoneHref} className="hidden text-[14px] font-semibold lg:inline" data-track="phone">{BRAND.phone}</a>
-          <Btn to="/contacts#estimate" className="hidden sm:inline-flex">Get a free estimate</Btn>
+          <a href={BRAND.phoneHref} className="hidden whitespace-nowrap text-[14px] font-semibold lg:inline xl:hidden 2xl:inline" data-track="phone">{BRAND.phone}</a>
+          <Btn to="/contacts#estimate" className="hidden whitespace-nowrap sm:inline-flex">Get a free estimate</Btn>
           <button className="menu-btn xl:hidden" aria-label="Open menu" aria-expanded="false" data-menu-open>
             <span /><span />
           </button>
@@ -334,20 +334,25 @@ export function StatsBand({ dark = false }: { dark?: boolean }) {
   )
 }
 
-const Stars = ({ size = 15 }: { size?: number }) => <span className="stars inline-flex" aria-label="5 out of 5 stars">{[0, 1, 2, 3, 4].map((i) => <svg key={i} width={size} height={size} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5l2.6 5.5 6 .7-4.4 4.1 1.2 5.9L10 14.8l-5.4 2.9 1.2-5.9L1.4 7.7l6-.7z" /></svg>)}</span>
+// service tags for review filtering on /reviews (matched against the review text itself)
+export const REVIEW_TAGS: [string, string, RegExp][] = [['decks', 'Decks', /\bdecks?\b/i], ['composite', 'Composite & PVC', /composite|pvc/i], ['railings', 'Railings', /railing/i], ['fences', 'Fences', /\bfenc/i], ['permits', 'Permits & drafting', /permit|draft/i], ['staining', 'Staining', /\bstain/i]]
+export const reviewTags = (q: string) => REVIEW_TAGS.filter(([, , re]) => re.test(q)).map(([k]) => k).join(' ')
+export const Stars = ({ size = 15 }: { size?: number }) => <span className="stars inline-flex" aria-label="5 out of 5 stars">{[0, 1, 2, 3, 4].map((i) => <svg key={i} width={size} height={size} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5l2.6 5.5 6 .7-4.4 4.1 1.2 5.9L10 14.8l-5.4 2.9 1.2-5.9L1.4 7.7l6-.7z" /></svg>)}</span>
 
 /* Review collage: Google rating summary, real client reviews, the client video and real project photos */
 export function Testimonials({ heading, eyebrow, noVideo = false, video, limit, allHref, showAll = false, headingTag = 'h2' }: { heading?: string; eyebrow?: string; noVideo?: boolean; video?: { src: string; preview: string; poster: string; caption: string; label: string }; limit?: number; allHref?: string; showAll?: boolean; headingTag?: 'h1' | 'h2' }) {
   const V = video || { src: 'media/testimonial-reel.mp4', preview: 'media/testimonial-preview.mp4', poster: 'ottawa-deck-pro-client-testimonial.webp', caption: 'Client testimonial · Ottawa Deck Pro on Instagram', label: 'Client video testimonial' }
   const ALL = ((reviewsJson as any).items as any[]).map((r) => ({ ...r, area: r.area || (TESTIMONIALS.find((t) => t.name === r.name) || ({} as any)).area || '' })) // every written review from the Google listing
   // homepage: the original site testimonials first, then the newest Google reviews
-  const R = limit ? [...ALL.filter((r) => TESTIMONIALS.some((t) => t.name === r.name)), ...ALL.filter((r) => !TESTIMONIALS.some((t) => t.name === r.name))].slice(0, limit) : ALL
+  const lim = showAll ? 0 : (limit || 6) // everywhere except /reviews: a short wall, then a link to the full page
+  allHref = showAll ? allHref : (allHref || '/reviews')
+  const R = lim ? [...ALL.filter((r) => TESTIMONIALS.some((t) => t.name === r.name)), ...ALL.filter((r) => !TESTIMONIALS.some((t) => t.name === r.name))].slice(0, lim) : ALL
   const G = (settingsJson as any).googleRating
-  const FIRST = showAll || limit ? R.length : 14
+  const FIRST = R.length
   const H = headingTag
   const photo = (p: Photo) => <figure key={p.file} className="rv-tile rv-photo reveal"><Img photo={p} sizes="(min-width:1024px) 25vw, 50vw" /><figcaption>Built by Ottawa Deck Pro</figcaption></figure>
   const text = (t: any, i: number) => (
-    <figure key={t.name + i} className={`rv-tile rv-text ${t.photos ? 'rv-has-photo' : ''} ${i >= FIRST ? 'rv-extra' : 'reveal'}`}>
+    <figure key={t.name + i} className={`rv-tile rv-text ${t.photos ? 'rv-has-photo' : ''} ${i >= FIRST ? 'rv-extra' : 'reveal'}`} data-rv-tags={reviewTags(t.quote)}>
       {t.photos ? <div className={`rv-photos rv-photos-${t.photos.length}`}>{t.photos.map((ph: any) => <img key={ph.src} src={imgSrc(ph.src)} alt={ph.alt} loading="lazy" decoding="async" />)}</div> : null}
       <div className="rv-body">
         <div className="flex items-center justify-between"><Stars /><span className="rv-src"><GLogo size={15} />{t.photos ? 'Google review with photos' : 'Google review'}</span></div>
@@ -384,7 +389,7 @@ export function Testimonials({ heading, eyebrow, noVideo = false, video, limit, 
           <a href={(settingsJson as any).googleReviewsUrl} target="_blank" rel="noopener" className="flex items-center gap-3 text-[15px] text-graphite/65 hover:text-graphite"><Stars /><span><b className="font-semibold text-graphite">{G.value}</b> · {G.count} Google reviews</span></a>
         </div>
         <div className="rv-grid mt-12">{tiles}</div>
-        {allHref ? <div className="mt-8 text-center"><a href={href(allHref)} className="btn btn-dark">See all {G.count} reviews <Arrow /></a></div> : R.length > FIRST ? <div className="mt-6 text-center"><button type="button" className="btn btn-outline" data-rv-more>Show all {R.length} written reviews</button></div> : null}
+        {allHref ? <div className="mt-8 flex flex-wrap justify-center gap-3"><a href={href(allHref)} className="btn btn-dark">See all reviews <Arrow /></a><a href={(settingsJson as any).googleReviewsUrl} target="_blank" rel="noopener" className="btn btn-outline"><GLogo size={16} />Read them on Google</a></div> : R.length > FIRST ? <div className="mt-6 text-center"><button type="button" className="btn btn-outline" data-rv-more>Show all {R.length} written reviews</button></div> : null}
         <FoundOn />
       </div>
     </section>
@@ -453,6 +458,15 @@ function Choice({ label, name, opts, required = false, wide = true, tiles = fals
     </div>
   )
 }
+function Select({ label, name, opts, required = false, wide = true, icon, placeholder = 'Choose one' }: { label: string; name: string; opts: string[]; required?: boolean; wide?: boolean; icon?: string; placeholder?: string }) {
+  return (
+    <label className={`field ef-field ${wide ? 'sm:col-span-2' : ''}`}>
+      <span>{label}{required ? <i aria-hidden="true"> *</i> : null}</span>
+      <span className="ef-input ef-select">{icon ? <Svg k={icon} /> : null}<select name={name} required={required} defaultValue=""><option value="" disabled>{placeholder}</option>{opts.map((o) => <option key={o}>{o}</option>)}</select></span>
+      <em className="err" />
+    </label>
+  )
+}
 function Field({ label, name, type = 'text', auto, required, wide, placeholder, icon }: any) {
   return (
     <label className={`field ef-field ${wide ? 'sm:col-span-2' : ''}`}>
@@ -480,16 +494,16 @@ export function EstimateForm({ wellness = false, kind }: { wellness?: boolean; k
         <span className="ef-badge"><span className="ef-dot" />Reply within 24 hours</span>
       </div>
       <div className="ef-progress" aria-hidden="true"><span data-ef-bar /></div>
-      <p className="ef-progress-label" data-ef-label>Step 1 of 2 · Your project</p>
 
       <div className="ef-body grid gap-4 sm:grid-cols-2">
-        {k === 'residential' ? <Choice label="What are we building?" name="service" required tiles opts={[['Deck', 'deck'], ['Railing', 'rail'], ['Fences', 'fence'], ['Staining', 'stain'], ['Backyard Makeover', 'yard'], ['3D Design', 'cube'], ['Outdoor Wellness', 'spa']]} /> : null}
-        {k === 'commercial' ? <Choice label="Property type" name="propertyType" required tiles opts={[['Condominium', 'building'], ['Apartment', 'building'], ['Townhouse complex', 'building'], ['Commercial property', 'building'], ['Other', 'cube']]} /> : null}
-        {k === 'wellness' ? <Choice label="What are you interested in?" name="service" required tiles opts={[['Outdoor sauna', 'sauna'], ['Cold plunge', 'plunge'], ['Sauna + cold plunge', 'spa'], ['Custom wellness space', 'yard'], ['Not sure yet', 'cube']]} /> : null}
+        {k === 'residential' ? <Select label="What are we building?" name="service" required icon="deck" placeholder="Choose a service" opts={['Deck', 'Railing', 'Fences', 'Staining', 'Backyard Makeover', '3D Design', 'Outdoor Wellness']} /> : null}
+        {k === 'commercial' ? <Select label="Property type" name="propertyType" required icon="building" placeholder="Choose a property type" opts={['Condominium', 'Apartment', 'Townhouse complex', 'Commercial property', 'Other']} /> : null}
+        {k === 'wellness' ? <Select label="What are you interested in?" name="service" required icon="spa" placeholder="Choose a product" opts={['Outdoor sauna', 'Cold plunge', 'Sauna + cold plunge', 'Custom wellness space', 'Not sure yet']} /> : null}
         {k === 'commercial' ? <><Field label="Company name" name="company" auto="organization" required icon="building" placeholder="Company" /><Field label="Contact name" name="name" auto="name" required icon="user" placeholder="Full name" /></> : <Field label="Your name" name="name" auto="name" required wide icon="user" placeholder="Full name" />}
         <Field label="Email" name="email" type="email" auto="email" required icon="mail" placeholder="you@email.com" />
         <Field label="Phone" name="phone" type="tel" auto="tel" required icon="phone" placeholder="613-555-0123" />
         <Field label={k === 'wellness' ? 'Installation location' : 'Project location'} name="area" auto="street-address" required wide icon="pin" placeholder="Address or neighbourhood, e.g. Kanata" />
+        <Choice label="Best way to reach you" name="contact_method" opts={[['Phone', 'phone'], ['Email', 'mail']]} />
       </div>
 
       <details className="ef-more">
@@ -506,7 +520,7 @@ export function EstimateForm({ wellness = false, kind }: { wellness?: boolean; k
       <input type="text" name="company_website" tabIndex={-1} autoComplete="off" className="hp" aria-hidden="true" />
       <button type="submit" className="ef-submit">{cta} <Arrow /></button>
       <div className="ef-trust">
-        <span><Svg k="star" size={14} />5.0 · 100+ Google reviews</span><span>WSIB covered</span><span>$5M insured</span>
+        <span><Svg k="star" size={14} />{(settingsJson as any).googleRating.value} · {(settingsJson as any).googleRating.count} Google reviews</span><span>WSIB covered</span><span>$5M insured</span>
       </div>
       <p className="form-status ef-status" role="status" aria-live="polite">Your details go only to Ottawa Deck Pro. No spam, ever.</p>
     </form>
@@ -527,12 +541,6 @@ export function LeadPaths({ heading = 'Let’s build something exceptional.', ey
           <ol className="ef-steps mt-10">
             {[['Send your project', 'Takes about 60 seconds.'], ['We call you within 24 hours', 'To ask a few questions and book a visit.'], ['Free on-site consultation', 'We measure, talk options and design in 3D.']].map(([t, d], i) => <li key={t}><span>{i + 1}</span><div><b>{t}</b><small>{d}</small></div></li>)}
           </ol>
-          <ul className="mt-10 space-y-3 text-[15px] text-ivory/70">
-            <li>Email: <a href={`mailto:${BRAND.email}`} className="text-ivory hover:underline">{BRAND.email}</a></li>
-            <li>Phone: <a href={BRAND.phoneHref} className="text-ivory hover:underline" data-track="phone">{BRAND.phone}</a> · Text: {BRAND.text}</li>
-            <li>Address: {BRAND.street}, {BRAND.city}, {BRAND.region}</li>
-            <li>Timing: {BRAND.hours}</li>
-          </ul>
         </div>
         <div>
           <div className="ef-tabs" role="tablist" data-lead-tabs>

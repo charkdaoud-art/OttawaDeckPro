@@ -287,7 +287,7 @@ export function Transformations() {
   const B = beforeAfter as any[]
   return (
     <Section id="transformations" dark>
-      <Title eyebrow="Before & after — the transformation." light sub="Drag the handle to reveal the finished project. Real before-and-after photos from an Ottawa Deck Pro project.">The transformation<br /><span className="text-bronze-light">speaks for itself.</span></Title>
+      <Title eyebrow="Before & after" light sub="Drag the handle to reveal the finished project. Real before-and-after photos from an Ottawa Deck Pro project.">The transformation<br /><span className="text-bronze-light">speaks for itself.</span></Title>
       <div className="mt-12" data-ba-grid>
         {B.slice(0, 1).map((b) => (
           <div key={b.id}>
@@ -311,27 +311,39 @@ export function Crew() {
   return (
     <section id="crew" className="bg-ivory">
       <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 pb-8 pt-14 lg:grid-cols-[1.35fr_1fr] lg:gap-16 lg:px-10 lg:pb-10 lg:pt-20">
-        <figure className="reveal overflow-hidden rounded-[28px]"><img src={imgSrc('ottawa-deck-pro-team.webp')} alt="The Ottawa Deck Pro team in front of a finished composite deck project" loading="lazy" className="aspect-[16/10] w-full object-cover" /></figure>
-        <div className="reveal">
+        <figure className="reveal order-2 overflow-hidden rounded-[28px] lg:order-1"><img src={imgSrc('ottawa-deck-pro-team.webp')} alt="The Ottawa Deck Pro team in front of a finished composite deck project" loading="lazy" className="aspect-[16/10] w-full object-cover" /></figure>
+        <div className="reveal order-1 lg:order-2">
           <Eyebrow>Meet the team</Eyebrow>
           <h2 className="mt-4 font-display text-[clamp(2.2rem,4.4vw,3.8rem)] font-semibold leading-[1.02] tracking-[-0.035em]">The people behind<br />the projects.</h2>
           <p className="mt-6 max-w-md text-[17px] leading-relaxed text-graphite/70">A local Stittsville crew that designs, builds and answers your calls. The same people who quote your project are the ones who show up to build it.</p>
           <Btn to="/contacts#estimate" variant="dark" className="mt-8">Book a consultation <Arrow /></Btn>
         </div>
       </div>
-      <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-3 px-5 pb-14 sm:gap-4 lg:grid-cols-4 lg:px-10 lg:pb-20">
-        {[
-          ['mike-ottawa-deck-pro-deck-builder.webp', 'Mike', 'Ottawa Deck Pro crew', 'Mike from the Ottawa Deck Pro crew'],
-          ['elie-ottawa-deck-pro-crew.webp', 'Elie', 'Ottawa Deck Pro crew', 'Elie from the Ottawa Deck Pro crew'],
-          ['sami-and-ivy-ottawa-deck-pro-crew.webp', 'Sami & Ivy', 'Ivy is our unofficial site inspector', 'Sami from the Ottawa Deck Pro crew holding Ivy, a French bulldog wearing sunglasses'],
-          ['mike-installing-composite-decking-ottawa.webp', 'On the job', 'Mike fastening composite deck boards', 'Mike installing composite deck boards on an Ottawa project'],
-        ].map(([src, name, sub, alt]) => (
-          <figure key={src} className="reveal group relative overflow-hidden rounded-[22px] bg-charcoal">
-            <img src={imgSrc(src)} alt={alt} loading="lazy" className="aspect-[4/5] w-full object-cover transition duration-700 group-hover:scale-[1.04]" />
-            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-charcoal/85 to-transparent p-4 pt-12 text-ivory sm:p-5 sm:pt-16"><span className="block font-display text-[20px] font-bold leading-none">{name}</span><span className="mt-1.5 block text-[12.5px] text-ivory/75">{sub}</span></figcaption>
+      {(() => {
+        const card = ([src, name, sub, alt, cls = '']: string[]) => (
+          <figure key={src} className={`reveal group relative overflow-hidden rounded-[22px] bg-charcoal ${cls}`}>
+            <img src={imgSrc(src)} alt={alt} loading="lazy" className="aspect-[4/5] w-full object-cover object-top transition duration-700 group-hover:scale-[1.04]" />
+            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-charcoal/85 to-transparent p-4 pt-12 text-ivory sm:p-5 sm:pt-16"><span className="block font-display text-[20px] font-bold leading-none">{name}</span><span className="mt-1.5 block text-[12.5px] leading-snug text-ivory/75">{sub}</span></figcaption>
           </figure>
-        ))}
-      </div>
+        )
+        return (<>
+          {/* founders and office on top, centred over the crew */}
+          <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-3 px-5 sm:gap-4 lg:grid-cols-4 lg:px-10">
+            {[
+              ['charbel-founder-ottawa-deck-pro.webp', 'Charbel', 'Founder', 'Charbel, founder of Ottawa Deck Pro, in a white Ottawa Deck Pro hoodie', 'lg:col-start-2'],
+              ['stephanie-office-ottawa-deck-pro.webp', 'Stephanie', 'Office and client care. Your first call, every schedule and every detail in between.', 'Stephanie from the Ottawa Deck Pro office in a white Ottawa Deck Pro hoodie'],
+            ].map(card)}
+          </div>
+          <div className="mx-auto mt-3 grid max-w-[1440px] grid-cols-2 gap-3 px-5 pb-14 sm:mt-4 sm:gap-4 lg:grid-cols-4 lg:px-10 lg:pb-20">
+            {[
+              ['elie-ottawa-deck-pro-crew.webp', 'Elie', 'Co-founder', 'Elie, co-founder of Ottawa Deck Pro', 'lg:order-2'],
+              ['mike-ottawa-deck-pro-deck-builder.webp', 'Mike', 'Team lead', 'Mike, team lead at Ottawa Deck Pro', 'lg:order-1'],
+              ['sami-and-ivy-ottawa-deck-pro-crew.webp', 'Sami & Ivy', 'Site manager. Ivy is our unofficial site inspector', 'Sami, site manager at Ottawa Deck Pro, holding Ivy, a French bulldog wearing sunglasses', 'lg:order-3'],
+              ['constantine-coast-ottawa-deck-pro-crew.webp', 'Constantine “Coast”', 'Ottawa Deck Pro crew', 'Constantine, known as Coast, from the Ottawa Deck Pro crew', 'lg:order-4'],
+            ].map(card)}
+          </div>
+        </>)
+      })()}
     </section>
   )
 }

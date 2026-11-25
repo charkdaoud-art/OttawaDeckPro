@@ -5,6 +5,8 @@ import { WALKTHROUGHS, COMMERCIAL_STOCK as CS } from './site'
 import { BRAND, ORIGIN, PHOTOS, RENDERS, GALLERY_FILTERS, AREAS, STATS, type Photo } from './site'
 import { CTX, href, imgSrc, wixImage, Inline, plain, asset } from './lib'
 import { parsePage, type Block } from './parse'
+import { Stars, GLogo, REVIEW_TAGS, reviewTags } from './ui'
+import reviewsJson from '../content/collections/reviews.json'
 import { Document, PageHero, Sections, Crumbs, crumbLd, StatsBand, Testimonials, FaqBlock, faqLd, EstimateSection, EstimateForm, Btn, Arrow, Eyebrow, Img, Brands, PhotoBand, TrustBar, ProcessSteps, type Meta } from './ui'
 import { Divisions, Reels, ShowroomMap, LiveFeed, CommercialSpotlight, Transformations, ProjectWizard, Team, Crew, Media, Panel, WalkReel } from './divisions'
 import { TESTIMONIALS } from './site'
@@ -162,6 +164,9 @@ export function Home() {
         </div>
       </section>
 
+      {/* real client interview, featured */}
+      <ClientInterview />
+
       {/* 04 RESIDENTIAL SERVICES */}
       <section className="bg-ivory">
         <div className="mx-auto max-w-[1440px] px-5 py-14 lg:px-10 lg:py-20">
@@ -218,7 +223,7 @@ export function Home() {
             <li key={t} className="reveal rounded-2xl border border-graphite/10 bg-ivory p-5"><span className="font-display text-[13px] font-bold tracking-[0.18em] text-bronze-dark">STEP {i + 1}</span><p className="mt-2 text-[16px] font-semibold">{t}</p><p className="mt-1 text-[14px] leading-snug text-graphite/60">{d}</p></li>
           ))}
         </ol>
-        <div className="mt-8 flex flex-wrap justify-center gap-3"><Btn to="/contacts#estimate" variant="dark">Book a design consultation <Arrow /></Btn><Btn to="/wellness/retreat-configurator" variant="outline">Try our 3D sauna designer</Btn></div>
+        <div className="mt-8 flex flex-wrap justify-center gap-3"><Btn to="/contacts#estimate" variant="dark">Book a design consultation <Arrow /></Btn></div>
       </div></section>
       {/* reels */}
       <Reels />
@@ -245,9 +250,9 @@ export function Home() {
           </dl>
         </div>
       </section>
-      <Testimonials heading="HOW OUR CLIENTS DESCRIBE US" eyebrow="Real Client Testimonials" limit={10} allHref="/reviews" video={{ src: 'media/kanata-composite-deck-client-testimonial.mp4', preview: 'media/kanata-composite-deck-client-testimonial-preview.mp4', poster: 'kanata-composite-deck-client-testimonial.webp', caption: 'Client testimonial · Composite deck in Kanata', label: 'Kanata homeowners talk about their new composite deck with Ottawa Deck Pro' }} />
+      <Testimonials heading="HOW OUR CLIENTS DESCRIBE US" eyebrow="Real Client Testimonials" limit={6} allHref="/reviews" noVideo video={{ src: 'media/kanata-composite-deck-client-testimonial.mp4', preview: 'media/kanata-composite-deck-client-testimonial-preview.mp4', poster: 'kanata-composite-deck-client-testimonial.webp', caption: 'Client testimonial · Composite deck in Kanata', label: 'Kanata homeowners talk about their new composite deck with Ottawa Deck Pro' }} />
       {/* estimate form after the reviews */}
-      <EstimateSection id="estimate-reviews" eyebrow="Join 100+ happy clients" heading="Your backyard is next." sub="Rated 5.0 from 100+ Google reviews. Send your project and a team member will be in touch within 24 hours." photo={PHOTOS.evening} />
+      <EstimateSection id="estimate-reviews" eyebrow="Real Google reviews" heading="Your backyard is next." sub={`Rated ${(settingsJson as any).googleRating.value} from ${(settingsJson as any).googleRating.count} Google reviews. Send your project and a team member will be in touch within 24 hours.`} photo={PHOTOS.evening} />
       <Brands heading="HIGH-PERFORMANCE MATERIALS FROM TRUSTED BRAND" />
 
       {/* 08 FAQ */}
@@ -739,20 +744,131 @@ export function NotFound() {
   )
 }
 
+function ClientInterview() {
+  const G = (settingsJson as any).googleRating
+  return (
+    <section className="ci bg-charcoal text-ivory">
+      <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-14 lg:grid-cols-[1fr_0.8fr] lg:gap-16 lg:px-10 lg:py-20">
+        <div className="reveal">
+          <p className="eyebrow text-bronze-light">Real client interview</p>
+          <h2 className="mt-4 font-display text-[clamp(2.2rem,4.6vw,4rem)] font-bold leading-[1.02] tracking-tight">Hear it from our clients</h2>
+          <p className="mt-6 max-w-xl text-[18px] leading-relaxed text-ivory/75">Kanata homeowners talk about their new composite deck, on camera, in their own backyard. Hear what it was like working with our crew.</p>
+          <a href={(settingsJson as any).googleReviewsUrl} target="_blank" rel="noopener" className="mt-8 flex items-center gap-3 text-[15px] text-ivory/70 hover:text-ivory"><Stars size={17} /><span><b className="font-semibold text-ivory">{G.value}</b> · {G.count} Google reviews</span></a>
+          <div className="mt-8 flex flex-wrap gap-3"><Btn to="/reviews" variant="primary">Read all reviews <Arrow /></Btn><Btn to="#estimate-team" variant="ghost-light">Get a free estimate</Btn></div>
+        </div>
+        <figure className="ci-video rv-video reveal" data-rv-video>
+          <video src={asset('media/kanata-composite-deck-client-testimonial-preview.mp4')} data-full={asset('media/kanata-composite-deck-client-testimonial.mp4')} poster={imgSrc('kanata-composite-deck-client-testimonial.webp')} muted loop playsInline autoPlay preload="metadata" aria-label="Kanata homeowners talk about their new composite deck with Ottawa Deck Pro" />
+          <button type="button" className="rv-play" data-rv-play><span aria-hidden="true">▶</span> Play the interview</button>
+          <figcaption>Client interview · Composite deck in Kanata</figcaption>
+        </figure>
+      </div>
+    </section>
+  )
+}
+
 export function Reviews() {
   const trail: [string, string][] = [['Home', '/'], ['Reviews', '/reviews']]
   const G = (settingsJson as any).googleRating
-  const meta: Meta = { title: `Ottawa Deck Pro Reviews | ${G.value} Stars from ${G.count} Google Reviews`, desc: `Read what Ottawa homeowners say about Ottawa Deck Pro. Rated ${G.value} out of 5 from ${G.count} Google reviews for decks, railings, fences and backyard makeovers.`, canonical: ORIGIN + '/reviews', extraLd: [crumbLd(trail)] }
+  const GURL = (settingsJson as any).googleReviewsUrl
+  const ALL = (reviewsJson as any).items as { name: string; quote: string; href?: string }[]
+  // what clients mention most: counted from the review text at build time, so the numbers stay true
+  const sentences = (q: string) => q.replace(/\s+/g, ' ').split(/(?<=[.!?])\s+/)
+  const THEMES: [string, RegExp][] = [['Would recommend', /recommend/i], ['Professional', /professional/i], ['Clean work', /clean/i], ['Quality craftsmanship', /quality|craftsmanship/i], ['Design help', /design/i], ['On time', /on time|when they said/i], ['Attention to detail', /attention to detail|the details/i], ['Permits handled', /permit/i]]
+  const used = new Set<string>()
+  const themes = THEMES.map(([label, re]) => {
+    const hits = ALL.filter((r) => re.test(r.quote))
+    let pick: { name: string; line: string } | null = null
+    for (const r of hits) { if (used.has(r.name)) continue; const line = sentences(r.quote).find((x) => re.test(x) && x.length >= 30 && x.length <= 170); if (line) { pick = { name: r.name, line }; used.add(r.name); break } }
+    return { label, count: hits.length, pick }
+  }).filter((t) => t.count >= 5).sort((x, y) => y.count - x.count)
+  const tagCount = (k: string) => ALL.filter((r) => reviewTags(r.quote).split(' ').includes(k)).length
+  const tags = REVIEW_TAGS.map(([k, label]) => ({ k, label, n: tagCount(k) })).filter((t) => t.n >= 2)
+  const top = themes[0]
+  const qa: [string, string][] = [
+    ['Are these real Ottawa Deck Pro reviews?', `Yes. Every review on this page was written by a client on our Google Business Profile and is shown word for word. Click a reviewer's name to see the original on Google.`],
+    ['What is Ottawa Deck Pro’s Google rating?', `${G.value} out of 5 stars from ${G.count} Google reviews.`],
+    ['What do clients mention most in their reviews?', themes.slice(0, 4).map((t) => `${t.label.toLowerCase()} (${t.count} reviews)`).join(', ').replace(/, ([^,]*)$/, ' and $1') + '.'],
+    ['What kinds of projects do the reviews cover?', `Mostly decks (${tagCount('decks')} reviews), plus railings, fences, composite and PVC decking, staining, and help with permits and drafting, across Ottawa and nearby towns.`],
+    ['How do I leave a review for Ottawa Deck Pro?', 'Open our Google listing and tap Write a review. It takes a minute and helps other Ottawa homeowners choose their builder.'],
+  ]
+  const meta: Meta = {
+    title: `Ottawa Deck Builder Reviews | ${G.value} Stars, ${G.count} Google Reviews`,
+    desc: `Read ${ALL.length} real Google reviews of Ottawa Deck Pro. Rated ${G.value} out of 5 by ${G.count} Ottawa homeowners for decks, railings, fences, staining and permits.`,
+    canonical: ORIGIN + '/reviews',
+    extraLd: [crumbLd(trail), faqLd(qa)],
+  }
+  const links: [string, string, string][] = [['/decks', 'Decks', 'Composite, PVC and wood decks'], ['/railings', 'Railings', 'Glass, aluminum and wood'], ['/fences', 'Fences', 'Privacy and pool fences'], ['/staining', 'Staining', 'Restore and protect wood'], ['/gallery', 'Project gallery', 'Photos of our recent builds'], ['/service-areas', 'Service areas', 'Ottawa and surrounding towns']]
   return (
     <Document meta={meta}>
-      <section className="bg-charcoal pb-14 pt-36 text-ivory lg:pt-44">
+      {/* hero */}
+      <section className="rvp-hero bg-charcoal pb-16 pt-36 text-ivory lg:pb-20 lg:pt-44">
         <div className="mx-auto max-w-[1440px] px-5 lg:px-10">
           <Crumbs trail={trail} />
-          <p className="mt-8 eyebrow text-bronze-light">{G.value} stars · {G.count} Google reviews</p>
+          <div className="mt-8 grid items-end gap-10 lg:grid-cols-[1.25fr_0.75fr]">
+            <div>
+              <p className="eyebrow text-bronze-light">Client reviews</p>
+              <h1 className="mt-4 font-display text-[clamp(2.4rem,5.4vw,4.6rem)] font-semibold leading-[1.02] tracking-[-0.035em]">Ottawa deck builder reviews</h1>
+              <p className="mt-6 max-w-2xl text-[18px] leading-relaxed text-ivory/75">Real words from Ottawa homeowners who built with us. Every review below comes straight from our Google listing, unedited.</p>
+              <div className="mt-8 flex flex-wrap gap-3"><a href={GURL} target="_blank" rel="noopener" className="btn btn-primary">Read them on Google <Arrow /></a><Btn to="#estimate" variant="ghost-light">Get a free estimate</Btn></div>
+            </div>
+            <div className="rvp-score">
+              <p className="flex items-center gap-2.5 text-[12px] font-semibold uppercase tracking-[0.22em] text-ivory/70"><span className="grid h-8 w-8 place-items-center rounded-full bg-white"><GLogo size={18} /></span>Google rating</p>
+              <div className="mt-4 flex items-end gap-4"><span className="font-display text-[84px] font-light leading-none tracking-[-0.04em]">{G.value}</span><span className="pb-3"><Stars size={22} /><span className="mt-2 block text-[14px] text-ivory/70">{G.count} Google reviews</span></span></div>
+              {top ? <p className="mt-5 border-t border-ivory/10 pt-5 text-[14.5px] text-ivory/70"><b className="text-ivory">{top.count} of {ALL.length}</b> written reviews say they would recommend us.</p> : null}
+            </div>
+          </div>
         </div>
       </section>
-      <Testimonials heading="Ottawa Deck Pro reviews" eyebrow="What our clients say" headingTag="h1" showAll video={{ src: 'media/kanata-composite-deck-client-testimonial.mp4', preview: 'media/kanata-composite-deck-client-testimonial-preview.mp4', poster: 'kanata-composite-deck-client-testimonial.webp', caption: 'Client testimonial · Composite deck in Kanata', label: 'Kanata homeowners talk about their new composite deck with Ottawa Deck Pro' }} />
-      <EstimateSection eyebrow="READY WHEN YOU ARE" sub="Tell us about your project and we will get back to you within 1 business day." photo={PHOTOS.multiLevel} />
+
+      {/* themes */}
+      <section className="bg-ivory">
+        <div className="mx-auto max-w-[1440px] px-5 py-14 lg:px-10 lg:py-20">
+          <Eyebrow>In their words</Eyebrow>
+          <h2 className="mt-4 font-display text-[clamp(1.9rem,3.6vw,3rem)] font-semibold leading-tight tracking-[-0.03em]">What Ottawa clients mention most</h2>
+          <p className="mt-4 max-w-2xl text-[16px] text-graphite/65">Counted across all {ALL.length} written reviews on this page.</p>
+          <div className="rvp-themes mt-10">
+            {themes.map((t) => (
+              <figure key={t.label} className="rvp-theme reveal">
+                <p className="rvp-num">{t.count}<span> reviews</span></p>
+                <h3 className="mt-1 text-[17px] font-semibold">{t.label}</h3>
+                {t.pick ? <blockquote className="mt-4 text-[14.5px] leading-relaxed text-graphite/70">“{t.pick.line}”<figcaption className="mt-2 text-[12.5px] font-semibold not-italic text-graphite/50">{t.pick.name}</figcaption></blockquote> : null}
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* filter + every review */}
+      <div className="rvp-filter-wrap bg-sand" data-rvp-filter>
+        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center gap-2 px-5 pt-12 lg:px-10 lg:pt-16" role="group" aria-label="Filter reviews by project">
+          <span className="mr-2 text-[13px] font-semibold uppercase tracking-[0.18em] text-graphite/50">Filter</span>
+          <button type="button" className="rvp-chip on" data-rvp-tag="" aria-pressed="true">All reviews <span>{ALL.length}</span></button>
+          {tags.map((t) => <button key={t.k} type="button" className="rvp-chip" data-rvp-tag={t.k} aria-pressed="false">{t.label} <span>{t.n}</span></button>)}
+        </div>
+      </div>
+      <Testimonials heading="Every written review" eyebrow={`${ALL.length} Google reviews`} showAll video={{ src: 'media/kanata-composite-deck-client-testimonial.mp4', preview: 'media/kanata-composite-deck-client-testimonial-preview.mp4', poster: 'kanata-composite-deck-client-testimonial.webp', caption: 'Client testimonial · Composite deck in Kanata', label: 'Kanata homeowners talk about their new composite deck with Ottawa Deck Pro' }} />
+
+      {/* leave a review */}
+      <section className="bg-charcoal text-ivory">
+        <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-6 px-5 py-12 md:flex-row md:items-center lg:px-10">
+          <div><h2 className="font-display text-[clamp(1.6rem,3vw,2.3rem)] font-semibold tracking-[-0.02em]">Built with us? Tell Ottawa how it went.</h2><p className="mt-2 text-[16px] text-ivory/65">Your review helps other homeowners pick the right builder.</p></div>
+          <a href={GURL} target="_blank" rel="noopener" className="btn btn-primary shrink-0"><span className="grid h-6 w-6 place-items-center rounded-full bg-white"><GLogo size={14} /></span>Leave a Google review</a>
+        </div>
+      </section>
+
+      {/* explore the work */}
+      <section className="bg-ivory">
+        <div className="mx-auto max-w-[1440px] px-5 py-14 lg:px-10 lg:py-20">
+          <Eyebrow>The work behind the reviews</Eyebrow>
+          <h2 className="mt-4 font-display text-[clamp(1.9rem,3.6vw,3rem)] font-semibold leading-tight tracking-[-0.03em]">See what our clients are talking about</h2>
+          <div className="rvp-links mt-10">
+            {links.map(([to, t, d]) => <a key={to} href={href(to)} className="rvp-link"><span><b>{t}</b><small>{d}</small></span><Arrow /></a>)}
+          </div>
+        </div>
+      </section>
+
+      <FaqBlock heading="Questions about our reviews" qa={qa} />
+      <EstimateSection eyebrow="Your backyard is next" heading="Join our happy Ottawa clients." sub="Tell us about your project and a team member will be in touch within 24 hours." photo={PHOTOS.multiLevel} />
     </Document>
   )
 }

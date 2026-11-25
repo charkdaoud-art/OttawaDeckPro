@@ -222,7 +222,7 @@
         if (err) err.textContent = msg
         if (msg) ok = false
       })
-      if (!ok) { var bad = form.querySelector('.field.invalid'); if (bad) { bad.scrollIntoView({ behavior: 'smooth', block: 'center' }); var fi = bad.querySelector('input:not(.ef-native), [data-value]'); fi && setTimeout(function () { fi.focus({ preventScroll: true }) }, 350) } return }
+      if (!ok) { var bad = form.querySelector('.field.invalid'); if (bad) { bad.scrollIntoView({ behavior: 'smooth', block: 'center' }); var fi = bad.querySelector('input:not(.ef-native), select:not(.ef-native), [data-value]'); fi && setTimeout(function () { fi.focus({ preventScroll: true }) }, 350) } return }
       if (form.company_website && form.company_website.value) return // spam
       var data = new FormData(form); data.append('page', location.pathname); data.append('form', form.getAttribute('data-form')); data.append('_subject', 'New estimate request from ottawadeckpro.ca')
       var done = function (sent) {
@@ -301,6 +301,17 @@
 /* review collage: expand long reviews, show all */
 ;(() => {
   document.querySelectorAll('[data-rv-quote]').forEach((q) => q.addEventListener('click', () => q.classList.toggle('open')))
+  // /reviews: filter review cards by project type
+  document.querySelectorAll('[data-rvp-filter]').forEach((bar) => {
+    const sec = bar.nextElementSibling && bar.nextElementSibling.matches('[data-rv]') ? bar.nextElementSibling : document.querySelector('[data-rv]')
+    if (!sec) return
+    bar.querySelectorAll('[data-rvp-tag]').forEach((chip) => chip.addEventListener('click', () => {
+      const tag = chip.getAttribute('data-rvp-tag')
+      bar.querySelectorAll('[data-rvp-tag]').forEach((c) => { c.classList.toggle('on', c === chip); c.setAttribute('aria-pressed', c === chip ? 'true' : 'false') })
+      sec.classList.add('rv-all'); sec.classList.toggle('rvp-filtered', !!tag)
+      sec.querySelectorAll('.rv-text').forEach((t) => { t.classList.add('in'); t.classList.toggle('rvp-hide', !!tag && !(t.getAttribute('data-rv-tags') || '').split(' ').includes(tag)) })
+    }))
+  })
   document.querySelectorAll('[data-rv-more]').forEach((b) => b.addEventListener('click', () => { const s = b.closest('[data-rv]'); s.classList.add('rv-all'); b.parentElement.remove() }))
 })()
 

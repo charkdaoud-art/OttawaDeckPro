@@ -149,7 +149,7 @@ async function lead(fd, ip, base) {
     total += file.size
     attachment.push({ name: clean(file.name, 120).replace(/[^\w.\- ]/g, '_') || 'file', content: Buffer.from(await file.arrayBuffer()).toString('base64') })
   }
-  const pairs = [['Name', name], ['Email', email], ['Phone', phone], ['Company', company], ['Location', area], ['Service', service], ['Property type', propertyType], ['Units', f('units', 80)], ['Size', f('size', 120)], ['Material', f('material', 120)], ['Timeline', f('timeline', 120)], ['Budget', f('budget', 120)], ['Capacity', f('capacity', 80)], ['Selections', selections], ['Message', f('message', 4000)], ['Files', attachment.length ? `${attachment.length} attached` + (skipped ? `, ${skipped} too large to attach` : '') : skipped ? `${skipped} too large to attach` : ''], ['Page', f('page', 200)]]
+  const pairs = [['Name', name], ['Email', email], ['Phone', phone], ['Best way to reach', f('contact_method', 20)], ['Company', company], ['Location', area], ['Service', service], ['Property type', propertyType], ['Units', f('units', 80)], ['Size', f('size', 120)], ['Material', f('material', 120)], ['Timeline', f('timeline', 120)], ['Budget', f('budget', 120)], ['Capacity', f('capacity', 80)], ['Selections', selections], ['Message', f('message', 4000)], ['Files', attachment.length ? `${attachment.length} attached` + (skipped ? `, ${skipped} too large to attach` : '') : skipped ? `${skipped} too large to attach` : ''], ['Page', f('page', 200)]]
   await brevo('/smtp/email', {
     sender: FROM, to: LEAD_TO.map((email) => ({ email })), replyTo: { email, name },
     subject: `New estimate request: ${name}, ${service}, ${area}`,

@@ -172,6 +172,7 @@ export const NAV = [
     { label: 'Design your retreat', href: '/wellness/retreat-configurator', desc: 'Live 3D configurator with estimate' },
   ] },
   { label: 'Our Projects', href: '/gallery' },
+  { label: 'Reviews', href: '/reviews' },
   { label: 'Service Areas', href: '/service-areas' },
   { label: 'Blog', href: '/blog' },
   { label: 'Contact', href: '/contacts' },
