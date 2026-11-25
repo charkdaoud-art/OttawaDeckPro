@@ -351,3 +351,28 @@
   })
   calc()
 })()
+
+// occasion bar: shows the occasion whose MM-DD range includes today (content/collections/occasions.json)
+;(function () {
+  var d = document, el = d.getElementById('odp-occasions'); if (!el) return
+  var cfg; try { cfg = JSON.parse(el.textContent) } catch (e) { return }
+  if (!cfg || !cfg.enabled) return
+  var now = new Date(), md = ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2)
+  var forced = (location.search.match(/[?&]occasion=([\w-]+)/) || [])[1]
+  var inRange = function (s, e) { return s <= e ? md >= s && md <= e : md >= s || md <= e }
+  var o = (cfg.items || []).filter(function (x) { return forced ? x.id === forced : inRange(x.start, x.end) })[0]
+  if (!o) return
+  var key = 'odp_occ_closed_' + o.id
+  try { if (!forced && localStorage.getItem(key)) return } catch (e) {}
+  var icons = { christmas: ['🎄', '🎁'], halloween: ['🎃', '👻'], fathers: ['🔥', '🍔'], mothers: ['💐', '🌷'], canada: ['🍁', '🍁'], thanksgiving: ['🍂', '🦃'], spring: ['🌱', '☀️'], plain: ['', ''] }
+  var ic = icons[o.theme] || icons.plain
+  var esc = function (t) { return String(t || '').replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) }
+  var bar = d.createElement('div'); bar.className = 'occ occ-' + esc(o.theme); bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Announcement')
+  var lights = ''
+  if (o.theme === 'christmas') { var cols = ['#FF4B4B', '#FFD34D', '#4BD37A', '#4BB3FF', '#FF7AD9']; for (var i = 0; i < 24; i++) lights += '<i style="--c:' + cols[i % 5] + ';--d:' + (i % 7) * 0.25 + 's"></i>'; lights = '<span class="occ-lights" aria-hidden="true">' + lights + '</span>' }
+  bar.innerHTML = lights + '<span class="occ-msg">' + (ic[0] ? '<span class="occ-ico" aria-hidden="true">' + ic[0] + '</span>' : '') + '<span class="occ-long">' + esc(o.message) + '</span><span class="occ-short">' + esc(o.short || o.message) + '</span>' + (ic[1] ? '<span class="occ-ico" aria-hidden="true">' + ic[1] + '</span>' : '') + '</span>' +
+    (o.link && o.cta ? '<a class="occ-cta" href="' + esc(o.link) + '">' + esc(o.cta) + '</a>' : '') + '<button type="button" class="occ-x" aria-label="Close announcement">×</button>'
+  if (o.link) { bar.setAttribute('data-href', o.link); bar.addEventListener('click', function (e) { if (innerWidth <= 640 && !e.target.closest('.occ-x')) location.href = o.link }) }
+  d.body.insertBefore(bar, d.body.firstChild); d.documentElement.classList.add('has-occ')
+  bar.querySelector('.occ-x').addEventListener('click', function () { bar.remove(); d.documentElement.classList.remove('has-occ'); try { localStorage.setItem(key, '1') } catch (e) {} })
+})()

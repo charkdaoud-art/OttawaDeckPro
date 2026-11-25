@@ -425,3 +425,36 @@ p { text-wrap: pretty; }
 .post-figure img { margin: 0; width: 100%; border-radius: 22px; aspect-ratio: 16/10; object-fit: cover; box-shadow: 0 30px 70px -40px rgba(14,19,17,.55); }
 .post-figure figcaption { margin-top: 10px; font-size: 14px; color: rgba(32,37,42,.55); }
 .post-callout { margin: 2em 0; padding: 22px 26px; border-radius: 20px; background: #EEF6E6; border-left: 5px solid #7CBC42; font-size: 18px; line-height: 1.7; color: #20252A; }
+
+/* ---------- occasion bar (content/collections/occasions.json) ---------- */
+html.has-occ { --occ-h: 40px; }
+@media (max-width: 640px) { html.has-occ { --occ-h: 36px; } }
+html.has-occ .site-header { top: var(--occ-h); }
+.occ { position: fixed; inset: 0 0 auto 0; height: var(--occ-h); z-index: 55; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 14px; padding: 0 44px; color: #fff; font-size: 13.5px; font-weight: 600; letter-spacing: .01em; }
+.occ-msg { position: relative; z-index: 2; display: flex; align-items: center; gap: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.occ-msg .occ-short { display: none; }
+@media (max-width: 640px) { .occ { font-size: 13px; gap: 8px; padding: 0 36px; } .occ-msg .occ-long { display: none; } .occ-msg .occ-short { display: inline; } .occ-cta { display: none; } .occ[data-href] { cursor: pointer; } }
+.occ-ico { flex: none; font-size: 15px; line-height: 1; }
+.occ-cta { position: relative; z-index: 2; flex: none; padding: 4px 12px; border-radius: 999px; background: rgba(255,255,255,.95); color: #14301F; font-size: 12px; font-weight: 800; letter-spacing: .02em; transition: transform .2s; }
+.occ-cta:hover { transform: translateY(-1px); }
+.occ-x { position: absolute; right: 8px; top: 50%; z-index: 3; transform: translateY(-50%); width: 28px; height: 28px; border-radius: 999px; color: rgba(255,255,255,.75); font-size: 18px; line-height: 1; }
+.occ-x:hover { color: #fff; background: rgba(255,255,255,.12); }
+
+/* christmas */
+.occ-christmas { background: linear-gradient(90deg, #0F2A1B 0%, #16402A 50%, #0F2A1B 100%); }
+.occ-christmas::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(1.6px 1.6px at 10% 20%, #fff 50%, transparent 52%), radial-gradient(1.2px 1.2px at 30% 70%, #fff 50%, transparent 52%), radial-gradient(1.8px 1.8px at 55% 30%, #fff 50%, transparent 52%), radial-gradient(1.3px 1.3px at 72% 80%, #fff 50%, transparent 52%), radial-gradient(1.5px 1.5px at 88% 40%, #fff 50%, transparent 52%), radial-gradient(1.1px 1.1px at 45% 90%, #fff 50%, transparent 52%); background-size: 260px 40px; opacity: .55; animation: occ-snow 9s linear infinite; }
+.occ-christmas::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: repeating-linear-gradient(90deg, #D93A3A 0 14px, #fff 14px 28px, #3FA35B 28px 42px, #fff 42px 56px); opacity: .9; }
+.occ-lights { position: absolute; left: 0; right: 0; top: 0; height: 8px; z-index: 1; display: flex; justify-content: space-around; pointer-events: none; }
+.occ-lights i { width: 6px; height: 8px; border-radius: 0 0 50% 50%; background: var(--c); box-shadow: 0 2px 8px var(--c); animation: occ-twinkle 1.8s ease-in-out infinite; animation-delay: var(--d); }
+@keyframes occ-snow { from { background-position: 0 -40px; } to { background-position: 60px 40px; } }
+@keyframes occ-twinkle { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+
+/* other themes */
+.occ-halloween { background: linear-gradient(90deg, #1A0F24, #3A1A0A 50%, #1A0F24); } .occ-halloween .occ-cta { color: #3A1A0A; }
+.occ-halloween::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: repeating-linear-gradient(90deg, #FF7A1A 0 18px, #1A0F24 18px 26px); }
+.occ-fathers { background: linear-gradient(90deg, #13253A, #1E3A5C 50%, #13253A); } .occ-fathers .occ-cta { color: #13253A; }
+.occ-mothers { background: linear-gradient(90deg, #6B2147, #9C3A6A 50%, #6B2147); } .occ-mothers .occ-cta { color: #6B2147; }
+.occ-canada { background: #C8102E; } .occ-canada .occ-cta { color: #C8102E; }
+.occ-thanksgiving { background: linear-gradient(90deg, #5A2A0C, #8A4A12 50%, #5A2A0C); } .occ-thanksgiving .occ-cta { color: #5A2A0C; }
+.occ-spring, .occ-plain { background: linear-gradient(90deg, #1F3A24, #3F6F24 50%, #1F3A24); }
+@media (prefers-reduced-motion: reduce) { .occ::before, .occ-lights i { animation: none !important; } }

@@ -1,5 +1,6 @@
 import React from 'react'
 import reviewsJson from '../content/collections/reviews.json'
+import occasionsJson from '../content/collections/occasions.json'
 import settingsJson from '../content/collections/settings.json'
 import { BRAND, NAV, STATS, TESTIMONIALS, ORIGIN, TRACKING, FORMS, PHOTOS, type Photo } from './site'
 import { CTX, href, asset, imgSrc, wixImage, Inline, plain, isCaps } from './lib'
@@ -64,6 +65,7 @@ export function Document({ meta, children, dark = true }: { meta: Meta; children
       </head>
       <body className={`bg-ivory text-graphite antialiased ${dark ? 'has-dark-hero' : ''}`}>
         <a href="#main" className="skip">Skip to content</a>
+        <script type="application/json" id="odp-occasions" dangerouslySetInnerHTML={{ __html: JSON.stringify(occasionsJson).replace(/</g, '\\u003c') }} />
         <Header />
         <main id="main">{children}</main>
         <Footer />

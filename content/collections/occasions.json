@@ -1,0 +1,13 @@
+{
+  "note": "Occasion bar shown above the menu. The first entry whose dates include today (visitor's local date) is shown. Dates are MM-DD and repeat every year; a range can cross New Year (start 12-01, end 01-06). theme: christmas | halloween | fathers | mothers | canada | thanksgiving | spring | plain. Leave link empty for no button. To turn the bar off completely set enabled to false.",
+  "enabled": true,
+  "items": [
+    { "id": "holidays-2026", "theme": "christmas", "start": "11-24", "end": "01-06", "message": "Merry Christmas & Happy New Year from the Ottawa Deck Pro family", "short": "Merry Christmas & Happy New Year", "link": "/contacts#estimate", "cta": "Book your spring build" },
+    { "id": "spring", "theme": "spring", "start": "03-15", "end": "04-30", "message": "Spring building season is here. Spots fill fast.", "short": "Spring season is here", "link": "/contacts#estimate", "cta": "Get a free estimate" },
+    { "id": "mothers", "theme": "mothers", "start": "05-05", "end": "05-12", "message": "Happy Mother's Day from the Ottawa Deck Pro family", "short": "Happy Mother's Day", "link": "", "cta": "" },
+    { "id": "fathers", "theme": "fathers", "start": "06-14", "end": "06-21", "message": "Happy Father's Day to every backyard BBQ master", "short": "Happy Father's Day", "link": "", "cta": "" },
+    { "id": "canada", "theme": "canada", "start": "06-28", "end": "07-02", "message": "Happy Canada Day from Ottawa Deck Pro", "short": "Happy Canada Day", "link": "", "cta": "" },
+    { "id": "thanksgiving", "theme": "thanksgiving", "start": "10-08", "end": "10-14", "message": "Happy Thanksgiving from the Ottawa Deck Pro family", "short": "Happy Thanksgiving", "link": "", "cta": "" },
+    { "id": "halloween", "theme": "halloween", "start": "10-24", "end": "10-31", "message": "Happy Halloween from Ottawa Deck Pro", "short": "Happy Halloween", "link": "", "cta": "" }
+  ]
+}
