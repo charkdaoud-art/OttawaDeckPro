@@ -192,7 +192,7 @@ export function Home() {
       {/* mid-page estimate nudge */}
       <div className="mid-cta bg-white"><div className="mx-auto flex max-w-[1440px] flex-col items-center justify-center gap-3 px-5 pb-4 pt-2 text-center sm:flex-row sm:gap-5 lg:px-10">
         <p className="text-[16px] font-medium text-graphite/70">Like what you see? Let's talk about your backyard.</p>
-        <Btn to="/contacts#estimate">Get a free estimate <Arrow /></Btn>
+        <Btn to="#estimate-team">Get a free estimate <Arrow /></Btn>
       </div></div>
 
       {/* 05 HOW IT WORKS: 3D design vs built + the 4 steps */}
@@ -226,6 +226,9 @@ export function Home() {
       {/* 06 CREW */}
       <Crew />
 
+      {/* estimate form after the team */}
+      <EstimateSection id="estimate-team" eyebrow="Free estimate" heading="Meet the crew in your backyard." sub="Tell us about your project and our team will reach out within 24 hours to book your free on-site consultation." photo={PHOTOS.coveredPatio} />
+
       {/* 14 REVIEWS */}
       {/* Trust: original copy + project stats, compact */}
       <section id="trust" className="bg-charcoal text-ivory">
@@ -243,6 +246,8 @@ export function Home() {
         </div>
       </section>
       <Testimonials heading="HOW OUR CLIENTS DESCRIBE US" eyebrow="Real Client Testimonials" limit={10} allHref="/reviews" video={{ src: 'media/kanata-composite-deck-client-testimonial.mp4', preview: 'media/kanata-composite-deck-client-testimonial-preview.mp4', poster: 'kanata-composite-deck-client-testimonial.webp', caption: 'Client testimonial · Composite deck in Kanata', label: 'Kanata homeowners talk about their new composite deck with Ottawa Deck Pro' }} />
+      {/* estimate form after the reviews */}
+      <EstimateSection id="estimate-reviews" eyebrow="Join 100+ happy clients" heading="Your backyard is next." sub="Rated 5.0 from 100+ Google reviews. Send your project and a team member will be in touch within 24 hours." photo={PHOTOS.evening} />
       <Brands heading="HIGH-PERFORMANCE MATERIALS FROM TRUSTED BRAND" />
 
       {/* 08 FAQ */}

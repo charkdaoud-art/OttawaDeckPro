@@ -138,11 +138,13 @@
     })
   })
   // lead path tabs
-  function setLead(k) {
-    d.querySelectorAll('[data-lead-tab]').forEach(function (x) { var on = x.dataset.leadTab === k; x.classList.toggle('on', on); x.setAttribute('aria-selected', on) })
-    d.querySelectorAll('[data-lead-panel]').forEach(function (p) { p.hidden = p.dataset.leadPanel !== k })
+  // tabs switch only their own form section (a page can hold several estimate sections); setLead(k) with no scope switches all
+  function setLead(k, scope) {
+    var root = scope || d
+    root.querySelectorAll('[data-lead-tab]').forEach(function (x) { var on = x.dataset.leadTab === k; x.classList.toggle('on', on); x.setAttribute('aria-selected', on) })
+    root.querySelectorAll('[data-lead-panel]').forEach(function (p) { p.hidden = p.dataset.leadPanel !== k })
   }
-  d.querySelectorAll('[data-lead-tab]').forEach(function (t) { t.addEventListener('click', function () { setLead(t.dataset.leadTab) }) })
+  d.querySelectorAll('[data-lead-tab]').forEach(function (t) { t.addEventListener('click', function () { setLead(t.dataset.leadTab, t.closest('[data-lead-section]')) }) })
   // project wizard: select → options → inspiration → estimate (selections carried into the form; no prices)
   var wz = d.querySelector('[data-wizard]')
   if (wz) {
@@ -172,6 +174,38 @@
     }) })
   }
 
+  // estimate form v2: choice tiles drive hidden selects, live progress, photo dropzone
+  d.querySelectorAll('form.ef').forEach(function (form) {
+    var req = function () { return [].slice.call(form.querySelectorAll('[required]')) }
+    var bar = form.querySelector('[data-ef-bar]'), label = form.querySelector('[data-ef-label]')
+    var valid = function (i) { var v = (i.value || '').trim(); if (!v) return false; if (i.type === 'email') return /^\S+@\S+\.\S+$/.test(v); if (i.type === 'tel') return v.replace(/\D/g, '').length >= 10; return true }
+    var update = function () {
+      var r = req(), n = r.filter(valid).length, pct = Math.max(4, Math.round(n / r.length * 100))
+      if (bar) bar.style.width = pct + '%'
+      if (label) { var done = n === r.length; label.classList.toggle('done', done); label.textContent = done ? 'Ready to send \u2713 Add details below for a sharper quote' : (n === 0 ? 'Step 1 of 2 \u00b7 Your project' : n + ' of ' + r.length + ' complete') }
+    }
+    form.querySelectorAll('[data-ef-choice]').forEach(function (grp) {
+      var sel = grp.parentNode.querySelector('select')
+      grp.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-value]'); if (!b) return
+        grp.querySelectorAll('[data-value]').forEach(function (x) { var on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-checked', on ? 'true' : 'false') })
+        sel.value = b.getAttribute('data-value'); sel.dispatchEvent(new Event('change', { bubbles: true }))
+        var f = grp.closest('.field'); f.classList.remove('invalid'); var er = f.querySelector('.err'); if (er) er.textContent = ''
+      })
+      grp.addEventListener('keydown', function (e) { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; var bs = [].slice.call(grp.querySelectorAll('[data-value]')), i = bs.indexOf(d.activeElement); if (i < 0) return; e.preventDefault(); bs[(i + (e.key === 'ArrowRight' ? 1 : bs.length - 1)) % bs.length].focus() })
+    })
+    form.addEventListener('input', function (e) { var f = e.target.closest && e.target.closest('.field'); if (f && f.classList.contains('invalid') && valid(e.target)) { f.classList.remove('invalid'); var er = f.querySelector('.err'); if (er) er.textContent = '' } update() })
+    form.addEventListener('change', update)
+    var drop = form.querySelector('[data-ef-drop]')
+    if (drop) {
+      var fin = drop.querySelector('input[type=file]'), txt = drop.querySelector('[data-ef-drop-text]'), orig = txt.textContent
+      ;['dragenter', 'dragover'].forEach(function (ev) { drop.addEventListener(ev, function () { drop.classList.add('drag') }) })
+      ;['dragleave', 'drop'].forEach(function (ev) { drop.addEventListener(ev, function () { drop.classList.remove('drag') }) })
+      fin.addEventListener('change', function () { var n = fin.files.length; drop.classList.toggle('has', n > 0); txt.textContent = n ? n + (n === 1 ? ' file' : ' files') + ' added \u2713' : orig })
+    }
+    update()
+  })
+
   // forms: validation, honeypot, confirmation. FORM_ENDPOINT is set at deploy time; without it nothing is sent.
   var ENDPOINT = window.ODP_FORM_ENDPOINT || ''
   d.querySelectorAll('form[data-form]').forEach(function (form) {
@@ -188,12 +222,16 @@
         if (err) err.textContent = msg
         if (msg) ok = false
       })
-      if (!ok) { var first = form.querySelector('.invalid input, .invalid select'); first && first.focus(); return }
+      if (!ok) { var bad = form.querySelector('.field.invalid'); if (bad) { bad.scrollIntoView({ behavior: 'smooth', block: 'center' }); var fi = bad.querySelector('input:not(.ef-native), [data-value]'); fi && setTimeout(function () { fi.focus({ preventScroll: true }) }, 350) } return }
       if (form.company_website && form.company_website.value) return // spam
       var data = new FormData(form); data.append('page', location.pathname); data.append('form', form.getAttribute('data-form')); data.append('_subject', 'New estimate request from ottawadeckpro.ca')
       var done = function (sent) {
-        form.innerHTML = '<div class="py-10 text-center"><p class="font-display text-[30px] font-bold">' + (sent ? 'Thank you.' : 'Your request is ready.') + '</p><p class="mt-3 text-graphite/70">' +
-          (sent ? 'We received your project details and will be in touch.' : 'This is the preview site, so nothing was sent. On the live site this goes straight to Ottawa Deck Pro.') + '</p></div>'
+        var first = ((form.name && form.name.value) || '').trim().split(' ')[0].replace(/[<>&"]/g, '')
+        form.innerHTML = '<div class="ef-done"><div class="ef-done-check"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></div><p class="mt-6 font-display text-[30px] font-extrabold tracking-tight">' + (sent ? 'Thank you' + (first ? ', ' + first : '') + '!' : 'Your request is ready.') + '</p><p class="mx-auto mt-3 max-w-sm text-[16px] leading-relaxed text-graphite/70">' +
+          (sent ? 'Thanks for sending your quote request. A team member will be in touch within 24 hours.' : 'This is the preview site, so nothing was sent. On the live site this goes straight to Ottawa Deck Pro.') + '</p>' +
+          '<div class="ef-spam"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><p><b>We just emailed you a confirmation.</b> Not in your inbox? Check your spam or junk folder and mark it <b>Not junk</b> so you get our future emails.</p></div>' +
+          '<a href="/gallery" class="btn btn-dark mt-6">See our recent projects</a></div>'
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' })
         if (sent && window.gtag) gtag('event', 'generate_lead', { form_name: form.getAttribute('data-form') })
         if (sent && window.fbq) fbq('track', 'Lead')
       }

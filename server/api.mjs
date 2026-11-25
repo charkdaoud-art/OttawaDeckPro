@@ -136,7 +136,9 @@ async function readForm(req) {
 
 async function lead(fd, ip, base) {
   const f = (k, n) => clean(fd.get(k), n)
-  const name = f('name', 120), email = f('email', 200), phone = f('phone', 40), area = f('area', 120), service = f('service', 80)
+  const name = f('name', 120), email = f('email', 200), phone = f('phone', 40), area = f('area', 120), company = f('company', 160), propertyType = f('propertyType', 80)
+  // commercial form has no service field: the property type stands in for it
+  const service = f('service', 80) || (propertyType ? `Commercial: ${propertyType}` : '')
   if (!name || !isEmail(email) || phone.replace(/\D/g, '').length < 10 || !area || !service) return { status: 400, error: 'Please fill in the required fields.' }
   let selections = ''
   try { const s = JSON.parse(f('selections', 4000) || 'null'); if (s && typeof s === 'object') selections = Object.entries(s).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join('\n') } catch { selections = f('selections', 4000) }
@@ -147,7 +149,7 @@ async function lead(fd, ip, base) {
     total += file.size
     attachment.push({ name: clean(file.name, 120).replace(/[^\w.\- ]/g, '_') || 'file', content: Buffer.from(await file.arrayBuffer()).toString('base64') })
   }
-  const pairs = [['Name', name], ['Email', email], ['Phone', phone], ['Location', area], ['Service', service], ['Size', f('size', 120)], ['Material', f('material', 120)], ['Timeline', f('timeline', 120)], ['Budget', f('budget', 120)], ['Selections', selections], ['Message', f('message', 4000)], ['Files', attachment.length ? `${attachment.length} attached` + (skipped ? `, ${skipped} too large to attach` : '') : skipped ? `${skipped} too large to attach` : ''], ['Page', f('page', 200)]]
+  const pairs = [['Name', name], ['Email', email], ['Phone', phone], ['Company', company], ['Location', area], ['Service', service], ['Property type', propertyType], ['Units', f('units', 80)], ['Size', f('size', 120)], ['Material', f('material', 120)], ['Timeline', f('timeline', 120)], ['Budget', f('budget', 120)], ['Capacity', f('capacity', 80)], ['Selections', selections], ['Message', f('message', 4000)], ['Files', attachment.length ? `${attachment.length} attached` + (skipped ? `, ${skipped} too large to attach` : '') : skipped ? `${skipped} too large to attach` : ''], ['Page', f('page', 200)]]
   await brevo('/smtp/email', {
     sender: FROM, to: LEAD_TO.map((email) => ({ email })), replyTo: { email, name },
     subject: `New estimate request: ${name}, ${service}, ${area}`,
@@ -159,7 +161,7 @@ async function lead(fd, ip, base) {
   brevo('/smtp/email', {
     sender: FROM, to: [{ email, name }], replyTo: { email: LEAD_TO[0], name: 'Ottawa Deck Pro' },
     subject: `Thanks ${name.split(' ')[0]}, we'll be in touch within 24 hours`,
-    htmlContent: welcomeEmail({ first: name.split(' ')[0], service, area, base }),
+    htmlContent: welcomeEmail({ first: name.split(' ')[0], service: f('service', 80) || (propertyType && propertyType !== 'Other' ? propertyType : 'commercial'), area, base }),
     tags: ['lead-confirmation'],
   }).catch((e) => console.error('confirmation failed', e.message))
   console.log('lead sent', ip, service, area)

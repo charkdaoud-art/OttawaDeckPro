@@ -413,57 +413,120 @@ export function FaqBlock({ heading, qa, id = 'faq' }: { heading?: string; qa: [s
 }
 export const faqLd = (qa: [string, string][]) => ({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: qa.map(([q, a]) => ({ '@type': 'Question', name: plain(q), acceptedAnswer: { '@type': 'Answer', text: plain(a) } })) })
 
-export function EstimateSection({ heading = 'Let’s build something exceptional.', sub = 'Tell us about your backyard project and let our team help bring it to life.', photo = PHOTOS.multiLevel, eyebrow }: any) {
-  return <LeadPaths heading={heading} sub={sub} photo={photo} eyebrow={eyebrow} />
+export function EstimateSection({ heading = 'Let’s build something exceptional.', sub = 'Tell us about your backyard project and let our team help bring it to life.', photo = PHOTOS.multiLevel, eyebrow, id }: any) {
+  return <LeadPaths heading={heading} sub={sub} photo={photo} eyebrow={eyebrow} id={id} />
+}
+
+const ICO: Record<string, React.ReactNode> = {
+  user: <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0" />,
+  mail: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></>,
+  phone: <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />,
+  pin: <><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z" /><circle cx="12" cy="10" r="2.5" /></>,
+  building: <><path d="M4 21V5l8-3v19M12 9h8v12M8 8h.01M8 12h.01M8 16h.01M16 13h.01M16 17h.01" /></>,
+  ruler: <path d="M3 17L17 3l4 4L7 21zM7 13l2 2M10 10l2 2M13 7l2 2" />,
+  hash: <path d="M5 9h14M5 15h14M10 3L8 21M16 3l-2 18" />,
+  deck: <path d="M3 15h18M5 15v5M19 15v5M12 15v5M4 11h16l-2-4H6z" />,
+  rail: <path d="M3 8h18M5 8v12M10 8v12M14 8v12M19 8v12M3 20h18" />,
+  fence: <path d="M5 21V7l2-3 2 3v14M15 21V7l2-3 2 3v14M3 11h18M3 17h18" />,
+  stain: <path d="M7 3h10v6H7zM12 9v4M10 13h4l1 8H9z" />,
+  yard: <path d="M12 3c3 3 5 6 5 9a5 5 0 0 1-10 0c0-3 2-6 5-9zM12 22v-6" />,
+  cube: <><path d="M12 2l9 5v10l-9 5-9-5V7z" /><path d="M12 22V12M21 7l-9 5-9-5" /></>,
+  spa: <path d="M12 21c-5 0-8-3-8-7 3 0 6 1 8 4 2-3 5-4 8-4 0 4-3 7-8 7zM12 18c0-5 2-9 4-12-3 1-4 3-4 6-0-3-1-5-4-6 2 3 4 7 4 12z" />,
+  sauna: <><rect x="4" y="8" width="16" height="13" rx="1" /><path d="M2 9l10-6 10 6M9 21v-6h6v6" /></>,
+  plunge: <path d="M3 14c2 0 2 1.5 4.5 1.5S10 14 12 14s2 1.5 4.5 1.5S19 14 21 14M4 10h16v10H4z" />,
+  star: <path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" />,
+  upload: <path d="M12 16V4M7 9l5-5 5 5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />,
+}
+const Svg = ({ k, size = 18 }: { k: string; size?: number }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ICO[k]}</svg>
+
+/** Choice tiles that drive a real (visually hidden) <select>, so validation and the submitted fields stay the same. */
+function Choice({ label, name, opts, required = false, wide = true, tiles = false }: { label: string; name: string; opts: (string | [string, string])[]; required?: boolean; wide?: boolean; tiles?: boolean }) {
+  const list = opts.map((o) => (typeof o === 'string' ? [o, ''] : o)) as [string, string][]
+  return (
+    <div className={`field ef-choice ${wide ? 'sm:col-span-2' : ''}`}>
+      <span>{label}{required ? <i aria-hidden="true"> *</i> : null}</span>
+      <select name={name} required={required} defaultValue="" className="ef-native" tabIndex={-1} aria-hidden="true"><option value="" />{list.map(([o]) => <option key={o}>{o}</option>)}</select>
+      <div className={tiles ? 'ef-tiles' : 'ef-chips'} role="radiogroup" aria-label={label} data-ef-choice={name}>
+        {list.map(([o, ic]) => <button key={o} type="button" role="radio" aria-checked="false" className={tiles ? 'ef-tile' : 'ef-chip'} data-value={o}>{ic ? <Svg k={ic} size={22} /> : null}<span>{o}</span></button>)}
+      </div>
+      <em className="err" />
+    </div>
+  )
+}
+function Field({ label, name, type = 'text', auto, required, wide, placeholder, icon }: any) {
+  return (
+    <label className={`field ef-field ${wide ? 'sm:col-span-2' : ''}`}>
+      <span>{label}{required ? <i aria-hidden="true"> *</i> : null}</span>
+      <span className="ef-input">{icon ? <Svg k={icon} /> : null}<input name={name} type={type} autoComplete={auto} required={required} placeholder={placeholder || ' '} inputMode={type === 'tel' ? 'tel' : undefined} /><svg className="ef-ok" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10" /></svg></span>
+      <em className="err" />
+    </label>
+  )
 }
 
 export function EstimateForm({ wellness = false, kind }: { wellness?: boolean; kind?: 'residential' | 'commercial' | 'wellness' }) {
   const k = kind || (wellness ? 'wellness' : 'residential')
-  const sel = (label: string, name: string, opts: string[], required = false) => (
-    <label className="field"><span>{label}{required ? <i aria-hidden="true"> *</i> : null}</span><select name={name} required={required} defaultValue=""><option value="" disabled={required}>Select…</option>{opts.map((o) => <option key={o}>{o}</option>)}</select><em className="err" /></label>
-  )
-  const budget = sel('Budget range', 'budget', ['Under $20K', '$20K to $40K', '$40K to $60K', '$60K to $90K', '$90K+'])
-  const timeline = sel('Desired timeline', 'timeline', ['As soon as possible', 'Spring 2027', 'Summer 2027', 'Fall 2027', 'Just planning'])
+  const budget = <Choice label="Budget range" name="budget" opts={['Under $20K', '$20K to $40K', '$40K to $60K', '$60K to $90K', '$90K+']} />
+  const timeline = <Choice label="Desired timeline" name="timeline" opts={['As soon as possible', 'Spring 2027', 'Summer 2027', 'Fall 2027', 'Just planning']} />
   const cta = { residential: 'Request your free estimate', commercial: 'Discuss your commercial project', wellness: 'Request a wellness quote' }[k]
+  const title = { residential: 'Tell us about your backyard', commercial: 'Tell us about your property', wellness: 'Plan your wellness retreat' }[k]
   return (
-    <form className="estimate-form reveal rounded-[28px] bg-ivory p-6 text-graphite shadow-2xl sm:p-9" data-form={k} noValidate encType="multipart/form-data">
+    <form className="estimate-form ef reveal" data-form={k} noValidate encType="multipart/form-data">
       <input type="hidden" name="selections" data-selections />
-      <div className="grid gap-4 sm:grid-cols-2">
-        {k === 'commercial' ? <><Field label="Company name" name="company" auto="organization" required /><Field label="Contact name" name="name" auto="name" required /></> : <Field label="Name" name="name" auto="name" required wide />}
-        <Field label="Email" name="email" type="email" auto="email" required />
-        <Field label="Phone" name="phone" type="tel" auto="tel" required />
-        <Field label={k === 'wellness' ? 'Installation location' : 'Project location'} name="area" auto="street-address" required />
-        {k === 'residential' ? sel('Service required', 'service', ['Deck', 'Railing', 'Fences', 'Staining', 'Backyard Makeover', '3D Design', 'Deck Package', 'Outdoor Wellness'], true) : null}
-        {k === 'commercial' ? sel('Property type', 'propertyType', ['Condominium', 'Apartment', 'Townhouse complex', 'Commercial property', 'Other'], true) : null}
-        {k === 'wellness' ? sel('Product interest', 'service', ['Outdoor sauna', 'Cold plunge', 'Sauna + cold plunge', 'Custom wellness space', 'Not sure yet'], true) : null}
+      <div className="ef-head">
+        <div>
+          <p className="ef-kicker">Free estimate · No obligation</p>
+          <h3 className="ef-title">{title}</h3>
+        </div>
+        <span className="ef-badge"><span className="ef-dot" />Reply within 24 hours</span>
       </div>
-      <details className="more mt-5">
-        <summary className="cursor-pointer text-[14px] font-semibold text-bronze-dark">+ Add project details (optional)</summary>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          {k === 'residential' ? <><Field label="Deck size" name="size" placeholder="e.g. 16 × 20 ft" />{sel('Material preference', 'material', ['Composite', 'PVC', 'Pressure-treated', 'Cedar', 'Not sure'])}{timeline}{budget}<label className="field sm:col-span-2"><span>Photos of your space</span><input type="file" name="photos" accept="image/*" multiple /></label></> : null}
-          {k === 'commercial' ? <><Field label="Number of decks or units" name="units" placeholder="e.g. 12" />{sel('Expected timeline', 'timeline', ['This season', 'Next season', '12+ months', 'Budgeting only'])}<label className="field sm:col-span-2"><span>Plans or documents</span><input type="file" name="documents" accept=".pdf,image/*,.dwg,.doc,.docx" multiple /></label></> : null}
-          {k === 'wellness' ? <>{sel('Preferred capacity', 'capacity', ['2 to 4 people', '4 to 6 people', 'Larger / custom'])}{timeline}{budget}</> : null}
-          <label className="field sm:col-span-2"><span>{k === 'commercial' ? 'Project description' : 'Project details'}</span><textarea name="message" rows={4} placeholder={k === 'commercial' ? 'Scope, phasing, access, current condition…' : 'What would you like built?'} /></label>
+      <div className="ef-progress" aria-hidden="true"><span data-ef-bar /></div>
+      <p className="ef-progress-label" data-ef-label>Step 1 of 2 · Your project</p>
+
+      <div className="ef-body grid gap-4 sm:grid-cols-2">
+        {k === 'residential' ? <Choice label="What are we building?" name="service" required tiles opts={[['Deck', 'deck'], ['Railing', 'rail'], ['Fences', 'fence'], ['Staining', 'stain'], ['Backyard Makeover', 'yard'], ['3D Design', 'cube'], ['Outdoor Wellness', 'spa']]} /> : null}
+        {k === 'commercial' ? <Choice label="Property type" name="propertyType" required tiles opts={[['Condominium', 'building'], ['Apartment', 'building'], ['Townhouse complex', 'building'], ['Commercial property', 'building'], ['Other', 'cube']]} /> : null}
+        {k === 'wellness' ? <Choice label="What are you interested in?" name="service" required tiles opts={[['Outdoor sauna', 'sauna'], ['Cold plunge', 'plunge'], ['Sauna + cold plunge', 'spa'], ['Custom wellness space', 'yard'], ['Not sure yet', 'cube']]} /> : null}
+        {k === 'commercial' ? <><Field label="Company name" name="company" auto="organization" required icon="building" placeholder="Company" /><Field label="Contact name" name="name" auto="name" required icon="user" placeholder="Full name" /></> : <Field label="Your name" name="name" auto="name" required wide icon="user" placeholder="Full name" />}
+        <Field label="Email" name="email" type="email" auto="email" required icon="mail" placeholder="you@email.com" />
+        <Field label="Phone" name="phone" type="tel" auto="tel" required icon="phone" placeholder="613-555-0123" />
+        <Field label={k === 'wellness' ? 'Installation location' : 'Project location'} name="area" auto="street-address" required wide icon="pin" placeholder="Address or neighbourhood, e.g. Kanata" />
+      </div>
+
+      <details className="ef-more">
+        <summary><span className="ef-more-ico">+</span><span><b>Add project details</b><small>Optional, but it gets you a more accurate quote</small></span></summary>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          {k === 'residential' ? <><Field label="Deck size" name="size" icon="ruler" placeholder="e.g. 16 × 20 ft" wide /><Choice label="Material preference" name="material" opts={['Composite', 'PVC', 'Pressure-treated', 'Cedar', 'Not sure']} />{timeline}{budget}</> : null}
+          {k === 'commercial' ? <><Field label="Number of decks or units" name="units" icon="hash" placeholder="e.g. 12" wide /><Choice label="Expected timeline" name="timeline" opts={['This season', 'Next season', '12+ months', 'Budgeting only']} /></> : null}
+          {k === 'wellness' ? <><Choice label="Preferred capacity" name="capacity" opts={['2 to 4 people', '4 to 6 people', 'Larger / custom']} />{timeline}{budget}</> : null}
+          {k !== 'wellness' ? <label className="field ef-drop sm:col-span-2"><span>{k === 'commercial' ? 'Plans or documents' : 'Photos of your space'}</span><span className="ef-drop-box" data-ef-drop><Svg k="upload" size={24} /><b data-ef-drop-text>{k === 'commercial' ? 'Drop plans here or tap to upload' : 'Drop photos here or tap to upload'}</b><small>{k === 'commercial' ? 'PDF, images, DWG or Word' : 'Your yard, the old deck, inspiration'}</small><input type="file" name={k === 'commercial' ? 'documents' : 'photos'} accept={k === 'commercial' ? '.pdf,image/*,.dwg,.doc,.docx' : 'image/*'} multiple /></span></label> : null}
+          <label className="field ef-field sm:col-span-2"><span>{k === 'commercial' ? 'Project description' : 'Project details'}</span><textarea name="message" rows={4} placeholder={k === 'commercial' ? 'Scope, phasing, access, current condition…' : 'What would you like built? Anything we should know?'} /></label>
         </div>
       </details>
+
       <input type="text" name="company_website" tabIndex={-1} autoComplete="off" className="hp" aria-hidden="true" />
-      <button type="submit" className="btn btn-dark mt-7 w-full justify-center">{cta} <Arrow /></button>
-      <p className="form-status mt-4 text-center text-[13px] text-graphite/55" role="status" aria-live="polite">No obligation. Your details go only to Ottawa Deck Pro.</p>
+      <button type="submit" className="ef-submit">{cta} <Arrow /></button>
+      <div className="ef-trust">
+        <span><Svg k="star" size={14} />5.0 · 100+ Google reviews</span><span>WSIB covered</span><span>$5M insured</span>
+      </div>
+      <p className="form-status ef-status" role="status" aria-live="polite">Your details go only to Ottawa Deck Pro. No spam, ever.</p>
     </form>
   )
 }
 
 /** Final conversion: three lead paths in one place. */
-export function LeadPaths({ heading = 'Let’s build something exceptional.', eyebrow, sub = 'Tell us about your backyard project and let our team help bring it to life.', photo = PHOTOS.multiLevel }: any) {
+export function LeadPaths({ heading = 'Let’s build something exceptional.', eyebrow, sub = 'Tell us about your backyard project and let our team help bring it to life.', photo = PHOTOS.multiLevel, id = 'estimate' }: any) {
   return (
-    <section id="estimate" className="relative isolate overflow-hidden bg-charcoal text-ivory">
-      <img src={imgSrc(photo.file)} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover opacity-25" loading="lazy" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-charcoal via-charcoal/90 to-charcoal/60" />
-      <div className="mx-auto grid max-w-[1440px] gap-12 px-5 py-14 lg:grid-cols-[1fr_1.1fr] lg:px-10 lg:py-20">
-        <div className="reveal">
+    <section id={id} className="relative isolate overflow-hidden bg-charcoal text-ivory" data-lead-section>
+      <img src={imgSrc(photo.file)} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover opacity-30" loading="lazy" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-charcoal via-charcoal/88 to-charcoal/55" />
+      <div className="mx-auto grid max-w-[1440px] gap-12 px-5 py-14 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:px-10 lg:py-20">
+        <div className="reveal lg:sticky lg:top-28">
           <Eyebrow light>{eyebrow || 'Free estimate'}</Eyebrow>
           <h2 className="mt-5 font-display text-[clamp(2.2rem,5vw,4.5rem)] font-extrabold uppercase leading-[0.98] tracking-[-0.01em]">{heading}</h2>
           <p className="mt-6 max-w-md text-[17px] leading-relaxed text-ivory/75">{sub}</p>
+          <ol className="ef-steps mt-10">
+            {[['Send your project', 'Takes about 60 seconds.'], ['We call you within 24 hours', 'To ask a few questions and book a visit.'], ['Free on-site consultation', 'We measure, talk options and design in 3D.']].map(([t, d], i) => <li key={t}><span>{i + 1}</span><div><b>{t}</b><small>{d}</small></div></li>)}
+          </ol>
           <ul className="mt-10 space-y-3 text-[15px] text-ivory/70">
             <li>Email: <a href={`mailto:${BRAND.email}`} className="text-ivory hover:underline">{BRAND.email}</a></li>
             <li>Phone: <a href={BRAND.phoneHref} className="text-ivory hover:underline" data-track="phone">{BRAND.phone}</a> · Text: {BRAND.text}</li>
@@ -472,8 +535,8 @@ export function LeadPaths({ heading = 'Let’s build something exceptional.', ey
           </ul>
         </div>
         <div>
-          <div className="mb-4 flex gap-1 rounded-full bg-ivory/10 p-1" role="tablist" data-lead-tabs>
-            {[['residential', 'Residential'], ['commercial', 'Commercial'], ['wellness', 'Wellness']].map(([k, l], i) => <button key={k} type="button" role="tab" aria-selected={i === 0} className={`lead-tab ${i === 0 ? 'on' : ''}`} data-lead-tab={k}>{l}</button>)}
+          <div className="ef-tabs" role="tablist" data-lead-tabs>
+            {[['residential', 'Residential', 'deck'], ['commercial', 'Commercial', 'building'], ['wellness', 'Wellness', 'sauna']].map(([k, l, ic], i) => <button key={k} type="button" role="tab" aria-selected={i === 0} className={`lead-tab ${i === 0 ? 'on' : ''}`} data-lead-tab={k}><Svg k={ic} size={17} />{l}</button>)}
           </div>
           <div data-lead-panel="residential"><EstimateForm kind="residential" /></div>
           <div data-lead-panel="commercial" hidden><EstimateForm kind="commercial" /></div>
@@ -481,15 +544,6 @@ export function LeadPaths({ heading = 'Let’s build something exceptional.', ey
         </div>
       </div>
     </section>
-  )
-}
-function Field({ label, name, type = 'text', auto, required, wide, placeholder }: any) {
-  return (
-    <label className={`field ${wide ? 'sm:col-span-2' : ''}`}>
-      <span>{label}{required ? <i aria-hidden="true"> *</i> : null}</span>
-      <input name={name} type={type} autoComplete={auto} required={required} placeholder={placeholder} />
-      <em className="err" />
-    </label>
   )
 }
 
