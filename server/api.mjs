@@ -1,7 +1,8 @@
 // Ottawa Deck Pro form handler: estimate leads + $5,000 email list, sent through Brevo.
-// Env: BREVO_API_KEY (required), BREVO_LIST_ID, LEAD_TO, MAIL_FROM, API_PORT
+// Env: BREVO_API_KEY (required), BREVO_LIST_ID, LEAD_TO, MAIL_FROM, API_PORT, JOBBER_* (see jobber.mjs)
 import http from 'node:http'
 import crypto from 'node:crypto'
+import * as jobber from './jobber.mjs'
 
 // accepts a plain xkeysib- key, or the base64 {"api_key": ...} form Brevo shows for MCP
 function readKey(raw) {
@@ -165,6 +166,12 @@ async function lead(fd, ip, base) {
     tags: ['lead-confirmation'],
   }).catch((e) => console.error('confirmation failed', e.message))
   console.log('lead sent', ip, service, area)
+  // save the contact as a Jobber client; runs after the lead is safe, and a failure only sends the owner a heads-up
+  if (jobber.connected()) jobber.saveClient({ name, email, phone, address: area, company }).then((r) => console.log('jobber client', r.existing ? 'already existed' : 'created')).catch((e) => {
+    jobber.state.lastError = { at: new Date().toISOString(), msg: String(e.message).slice(0, 300) }
+    console.error('jobber failed', e.message)
+    brevo('/smtp/email', { sender: FROM, to: LEAD_TO.map((email) => ({ email })), subject: `Not saved in Jobber: ${name}`, htmlContent: shell('Add this client to Jobber by hand', `<p style="margin:0 0 16px;font-size:15px;color:#4a4f4c">The estimate request came through, but Jobber didn't accept the new client. Reason: ${esc(e.message)}</p>${rows([['Name', name], ['Email', email], ['Phone', phone], ['Address', area], ['Company', company]])}`), tags: ['jobber-failed'] }).catch(() => {})
+  })
   return { status: 200 }
 }
 
@@ -200,7 +207,8 @@ http.createServer(async (req, res) => {
   try {
     const route = req.url.split('?')[0]
     if (req.method === 'GET' && route === '/api/health') {
-      const out = { ok: true, brevo: !!KEY, list: !!LIST_ID, lastError, keyFormat: KEY.startsWith('xkeysib-') ? 'api' : KEY ? 'other' : 'none' }
+      const out = { ok: true, brevo: !!KEY, list: !!LIST_ID, lastError, keyFormat: KEY.startsWith('xkeysib-') ? 'api' : KEY ? 'other' : 'none', jobber: { configured: jobber.configured(), connected: jobber.connected(), rotated: jobber.state.rotated, lastSaved: jobber.state.lastSaved, lastError: jobber.state.lastError } }
+      if (jobber.connected() && req.url.includes('check=1')) { try { out.jobber.account = (await jobber.gql('{ account { name } }')).account?.name } catch (e) { out.jobber.checkError = e.message.slice(0, 200) } }
       if (KEY && req.url.includes('check=1')) {
         try { const r = await fetch(BREVO + '/account', { headers: { 'api-key': KEY, accept: 'application/json' } }); out.brevoStatus = r.status; if (!r.ok) out.brevoError = (await r.text()).slice(0, 300) } catch (e) { out.brevoError = e.message }
       }
@@ -216,6 +224,19 @@ http.createServer(async (req, res) => {
         return html(200, "You're unsubscribed", `${esc(email)} won't receive any more offers from Ottawa Deck Pro.`)
       }
       return html(200, 'Unsubscribe?', `Stop receiving offers and updates at ${esc(email)}.</p><form method="post" style="margin:0 0 14px"><button type="submit" style="background:#20252A;color:#fff;border:0;font-weight:700;font-size:15px;padding:13px 24px;border-radius:999px;cursor:pointer">Unsubscribe me</button></form><p style="margin:0">`)
+    }
+    if (req.method === 'GET' && (route === '/api/jobber/connect' || route === '/api/jobber/callback')) {
+      const html = (code, title, msg) => { res.writeHead(code, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' }); res.end(page(title, msg)) }
+      const h = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim()
+      const b = /\.up\.railway\.app$|^localhost(:\d+)?$/.test(h) ? (h.startsWith('localhost') ? 'http://' : 'https://') + h : SITE
+      if (!jobber.configured()) return html(503, 'Jobber not set up yet', 'Add JOBBER_CLIENT_ID and JOBBER_CLIENT_SECRET in Railway first, then open this page again.')
+      if (route === '/api/jobber/connect') { res.writeHead(302, { location: jobber.connectUrl(b), 'cache-control': 'no-store' }); return res.end() }
+      const u = new URL(req.url, 'http://x')
+      if (u.searchParams.get('error')) return html(400, 'Not connected', 'Jobber access was not approved. Open /api/jobber/connect to try again.')
+      try {
+        const r = await jobber.callback(b, clean(u.searchParams.get('code'), 400), clean(u.searchParams.get('state'), 64))
+        return html(200, 'Jobber connected', `Connected to <b>${esc(r.account)}</b>. Website leads will now be saved as Jobber clients.</p><p style="margin:0 0 10px">Last step, so it survives restarts: in Railway, add a variable named <b>JOBBER_REFRESH_TOKEN</b> with this value, then close this page.</p><textarea readonly onclick="this.select()" style="width:100%;height:90px;font:13px monospace;padding:10px;border-radius:10px;border:1px solid #ccc">${esc(r.refresh)}</textarea><p style="margin:10px 0 0">`)
+      } catch (e) { console.error('jobber connect', e.message); return html(400, 'Not connected', esc(e.message)) }
     }
     if (req.method !== 'POST' || !['/api/lead', '/api/subscribe'].includes(route)) return send(404, { ok: false })
     const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim()
