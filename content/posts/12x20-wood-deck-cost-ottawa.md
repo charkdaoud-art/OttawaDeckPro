@@ -8,7 +8,7 @@ cover: pressure-treated-deck-black-picket-railing-ottawa.webp
 coverAlt: New pressure-treated wood deck with black picket railing in Ottawa
 keyword: 12x20 wood deck cost Ottawa
 category: Pricing
-status: draft
+status: published
 ---
 A 12x20 deck is a practical, family-sized deck. At 240 square feet, it fits a table for 6 and a couple of lounge chairs without taking over the yard. Built in wood, it is also one of the most affordable ways to add real outdoor living space. That is why **12x20 wood deck cost** is such a common question.
 

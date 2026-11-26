@@ -8,7 +8,7 @@ cover: grey-composite-deck-black-aluminum-railing-ottawa.webp
 coverAlt: Grey composite deck with black aluminum railing in Ottawa
 keyword: aluminum railing cost Ottawa
 category: Railings
-status: draft
+status: published
 ---
 If you are pricing a new deck or replacing an old wood railing, the first question is simple: what is the **aluminum railing cost in Ottawa**? In 2026, our installed price for aluminum railing is about **$90 to $140 per linear foot**, before tax.
 

@@ -8,7 +8,7 @@ cover: large-pressure-treated-ground-level-deck-step-lights-ottawa.webp
 coverAlt: Large ground-level pressure-treated deck with step lights and a raised landing in Ottawa
 keyword: 20x20 deck cost Ottawa
 category: Pricing
-status: draft
+status: published
 ---
 A 20x20 deck is a big outdoor room. At 400 square feet, it fits a dining table, a lounge set and a BBQ zone with space to spare. So it is no surprise that **20x20 deck cost** is one of the most common questions Ottawa homeowners ask Google before they call a builder.
 

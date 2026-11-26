@@ -8,7 +8,7 @@ cover: composite-vs-wood-decking-ottawa.webp
 coverAlt: Composite deck with a timber pavilion, lounge seating and steps in an Ottawa backyard
 keyword: 14x20 deck cost Ottawa
 category: Pricing
-status: draft
+status: published
 ---
 A 14x20 deck is one of the most popular sizes we see in Ottawa. At 280 square feet, it is big enough for a dining table and a lounge set, but it still fits most suburban yards in Kanata, Barrhaven and Orleans. That is why **14x20 deck cost** is such a common search.
 

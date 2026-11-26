@@ -8,7 +8,7 @@ cover: composite-deck-outdoor-living-space-ottawa.webp
 coverAlt: Small ground-level deck with patio chairs beside an Ottawa home
 keyword: deck for $5,000 Ottawa
 category: Pricing
-status: draft
+status: published
 ---
 "Can you build a deck for $5,000?" pops up on Google right under searches for deck builders in Ottawa. It is a fair question. Five thousand dollars is real money, and you want to know what it gets you before you start calling builders in Ottawa.
 

@@ -8,7 +8,7 @@ cover: hazeldean-backyard-deck-project.webp
 coverAlt: Raised pressure-treated deck with railing across the back of an Ottawa home
 keyword: 12x24 deck cost Ottawa
 category: Pricing
-status: draft
+status: published
 ---
 A 12x24 deck is long and shallow. It runs across the back of the house, gives every door and window a view of the yard, and leaves more lawn than a square deck of the same area. It is a common shape on Ottawa townhouses and on homes with a walkout where the deck sits a full storey up. So it makes sense that **12x24 deck cost** is a question so many people ask.
 
