@@ -58,6 +58,15 @@ Body:
 28. Decks in Manotick (local guide)
 29. Decks in Orleans (local guide)
 30. Pressure-treated deck cost in Ottawa
+31. Google "People also ask" cluster (owner, Nov 26: 3 to 5 posts per question, batch approval). Done Nov 26: 20x20 deck cost, 14x20 deck cost, 12x24 deck cost, 12x20 wood deck cost, deck for $5,000. Next angles:
+    - 20x20: composite 20x20 deck cost; raised 20x20 deck with railing and stairs; 20x20 deck layout ideas
+    - 14x20: 14x20 composite deck cost; 14x20 deck with glass railing; 14x20 deck layout ideas
+    - 12x24: second-storey 12x24 deck; 12x24 composite deck cost; 12x24 townhouse deck ideas
+    - 12x20 wood: 12x20 pressure-treated deck; 12x20 cedar deck; 12x20 wood vs composite cost over time
+    - $5,000: what size deck for $10,000 / $15,000 / $20,000; small deck ideas on a budget; cheapest way to build a deck in Ottawa
+    - What is the most expensive part of building a deck? (cost breakdown, railing vs decking, stairs cost)
+    - Is it cheaper to lay concrete or build a deck? (deck vs concrete patio vs interlock; use only owner deck prices, no invented concrete prices)
+    - How much does it cost to build a deck in Ottawa? / Do I need a permit? (already covered: /post/deck-cost-ottawa, /post/deck-permit-ottawa; add new angles only)
 
 ## Workflow for each daily run
 1. Pick the topic, research facts that need sources, write the post as `status: draft`.

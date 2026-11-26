@@ -48,10 +48,11 @@ function inline(t: string, k = 0): React.ReactNode[] {
 }
 function render(md: string) {
   const body = md.split(/\n## Frequently asked questions\s*\n/i)[0]
-  const lines = body.split('\n'); const nodes: React.ReactNode[] = []; let para: string[] = []; let list: string[] = []; let quote: string[] = []
+  const lines = body.split('\n'); const nodes: React.ReactNode[] = []; let para: string[] = []; let list: string[] = []; let olist: string[] = []; let quote: string[] = []
   const flush = (k: number) => {
     if (para.length) { nodes.push(<p key={'p' + k}>{inline(para.join(' '), k)}</p>); para = [] }
     if (list.length) { nodes.push(<ul key={'u' + k}>{list.map((l, i) => <li key={i}>{inline(l, k * 100 + i)}</li>)}</ul>); list = [] }
+    if (olist.length) { nodes.push(<ol key={'o' + k}>{olist.map((l, i) => <li key={i}>{inline(l, k * 100 + i)}</li>)}</ol>); olist = [] }
     if (quote.length) { nodes.push(<aside key={'q' + k} className="post-callout">{inline(quote.join(' '), k)}</aside>); quote = [] }
   }
   lines.forEach((ln, k) => {
@@ -60,7 +61,8 @@ function render(md: string) {
     if (img) { flush(k); nodes.push(<figure key={'f' + k} className="post-figure"><img src={imgSrc(img[2])} alt={img[1]} loading="lazy" decoding="async" />{img[3] ? <figcaption>{img[3]}</figcaption> : null}</figure>); return }
     if (/^### /.test(ln)) { flush(k); nodes.push(<h3 key={'h' + k}>{inline(ln.slice(4), k)}</h3>); return }
     if (/^## /.test(ln)) { flush(k); nodes.push(<h2 key={'h' + k} id={ln.slice(3).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}>{inline(ln.slice(3), k)}</h2>); return }
-    if (/^- /.test(ln)) { if (para.length || quote.length) flush(k); list.push(ln.slice(2)); return }
+    if (/^- /.test(ln)) { if (para.length || quote.length || olist.length) flush(k); list.push(ln.slice(2)); return }
+    if (/^\d+\. /.test(ln)) { if (para.length || quote.length || list.length) flush(k); olist.push(ln.replace(/^\d+\. /, '')); return }
     if (/^> /.test(ln)) { if (para.length || list.length) flush(k); quote.push(ln.slice(2)); return }
     para.push(ln.trim())
   })
