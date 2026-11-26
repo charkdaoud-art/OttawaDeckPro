@@ -64,16 +64,42 @@ export async function gql(query, variables = {}) {
 }
 
 // read the live schema once so we only send fields this Jobber API version accepts
+const T = `type { name kind ofType { name kind ofType { name kind ofType { name } } } }`
+const unwrap = (t) => { let list = false; while (t && !t.name) { if (t.kind === 'LIST') list = true; t = t.ofType } return { name: t?.name, list } }
+async function describe(name) {
+  if (!name) return {}
+  const d = await gql(`query($n: String!) { t: __type(name: $n) { inputFields { name ${T} } } }`, { n: name })
+  return Object.fromEntries((d.t?.inputFields || []).map((f) => [f.name, unwrap(f.type)]))
+}
 let schema = null
 async function fields() {
   if (schema) return schema
-  const T = `type { name kind ofType { name kind ofType { name kind ofType { name } } } }`
-  const d = await gql(`{ c: __type(name: "ClientCreateInput") { inputFields { name ${T} } } }`)
-  const named = (t) => { while (t && !t.name) t = t.ofType; return t?.name }
-  const input = Object.fromEntries((d.c?.inputFields || []).map((f) => [f.name, named(f.type)]))
-  let address = []
-  if (input.billingAddress) { const a = await gql(`query($n: String!) { t: __type(name: $n) { inputFields { name } } }`, { n: input.billingAddress }); address = (a.t?.inputFields || []).map((f) => f.name) }
-  return (schema = { input, address })
+  const input = await describe('ClientCreateInput')
+  const billing = input.billingAddress ? await describe(input.billingAddress.name) : {}
+  // propertyCreate(clientId, input): the job address Jobber shows on the client
+  const m = await gql(`{ m: __type(name: "Mutation") { fields { name args { name ${T} } } } }`)
+  const pc = (m.m?.fields || []).find((f) => f.name === 'propertyCreate')
+  const pcArgs = Object.fromEntries((pc?.args || []).map((a) => [a.name, unwrap(a.type)]))
+  const pcInput = pcArgs.input ? await describe(pcArgs.input.name) : {}
+  const propType = pcInput.properties ? await describe(pcInput.properties.name) : {}
+  const propAddr = propType.address ? await describe(propType.address.name) : pcInput.address ? await describe(pcInput.address.name) : {}
+  schema = { input, billing, pcArgs, pcInput, propType, propAddr }
+  console.log('jobber schema', JSON.stringify({ client: Object.keys(input), billing: Object.keys(billing), propertyCreate: Object.keys(pcArgs), propertyInput: Object.keys(pcInput), property: Object.keys(propType), propertyAddress: Object.keys(propAddr) }))
+  return schema
+}
+const street = (af) => ['street1', 'street', 'address1', 'line1'].find((k) => af[k]) || null
+
+async function addProperty(clientId, address) {
+  const { pcArgs, pcInput, propType, propAddr } = await fields()
+  const k = street(propAddr)
+  if (!pcArgs.clientId || !k) return console.log('jobber property skipped: no matching fields')
+  const addr = { [k]: address }
+  const input = pcInput.properties ? { properties: [propType.address ? { address: addr } : addr] } : pcInput.address ? { address: addr } : null
+  if (!input) return console.log('jobber property skipped: unknown input shape')
+  const d = await gql(`mutation($c: ${'EncodedId!'}, $i: ${pcArgs.input.name}!) { propertyCreate(clientId: $c, input: $i) { userErrors { message path } } }`, { c: clientId, i: input })
+  const errs = d.propertyCreate?.userErrors || []
+  if (errs.length) console.error('jobber property rejected', JSON.stringify(errs).slice(0, 300))
+  else console.log('jobber property added')
 }
 
 async function existing(email) {
@@ -87,20 +113,23 @@ async function existing(email) {
 export async function saveClient({ name, email, phone, address, company }) {
   const found = await existing(email)
   if (found) { state.lastSaved = { at: new Date().toISOString(), existing: true }; return { id: found.id, existing: true } }
-  const { input, address: af } = await fields()
+  const { input, billing } = await fields()
   const parts = name.trim().split(/\s+/)
   const c = { firstName: parts[0], lastName: parts.slice(1).join(' ') }
   if (company && input.companyName) c.companyName = company
   if (input.emails) c.emails = [{ description: 'MAIN', primary: true, address: email }]
   if (input.phones) c.phones = [{ description: 'MAIN', primary: true, number: phone }]
-  if (address && input.billingAddress) { const k = af.includes('street1') ? 'street1' : af.includes('street') ? 'street' : af[0]; if (k) c.billingAddress = { [k]: address } }
+  const bk = street(billing)
+  if (address && input.billingAddress && bk) c.billingAddress = { [bk]: address }
   const M = `mutation($input: ClientCreateInput!) { clientCreate(input: $input) { client { id } userErrors { message path } } }`
   let d = await gql(M, { input: c })
   let errs = d.clientCreate?.userErrors || []
-  if (errs.length && c.billingAddress) { delete c.billingAddress; d = await gql(M, { input: c }); errs = d.clientCreate?.userErrors || [] } // never lose a client over an address format
+  if (errs.length && c.billingAddress) { console.error('jobber billing address rejected', JSON.stringify(errs).slice(0, 300)); delete c.billingAddress; d = await gql(M, { input: c }); errs = d.clientCreate?.userErrors || [] } // never lose a client over an address format
   if (errs.length || !d.clientCreate?.client?.id) throw new Error('Jobber rejected client: ' + errs.map((e) => e.message).join('; ').slice(0, 200))
+  const id = d.clientCreate.client.id
+  if (address) await addProperty(id, address).catch((e) => console.error('jobber property failed', e.message))
   state.lastSaved = { at: new Date().toISOString(), existing: false }
-  return { id: d.clientCreate.client.id, existing: false }
+  return { id, existing: false }
 }
 
 // one-time owner setup: /api/jobber/connect -> Jobber login -> /api/jobber/callback
