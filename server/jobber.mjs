@@ -6,13 +6,14 @@ import fs from 'node:fs'
 
 const BASE = process.env.JOBBER_BASE || 'https://api.getjobber.com'
 const VERSION = process.env.JOBBER_API_VERSION || '2025-04-16'
-const ID = process.env.JOBBER_CLIENT_ID || ''
-const SECRET = process.env.JOBBER_CLIENT_SECRET || ''
+const env = (k) => String(process.env[k] || '').trim().replace(/^['"]|['"]$/g, '').trim() // tolerate stray spaces or quotes pasted into Railway
+const ID = env('JOBBER_CLIENT_ID')
+const SECRET = env('JOBBER_CLIENT_SECRET')
 const FILE = process.env.JOBBER_TOKEN_FILE || ''
 
 let refresh = ''
 try { if (FILE) refresh = JSON.parse(fs.readFileSync(FILE, 'utf8')).refresh || '' } catch {}
-refresh = refresh || process.env.JOBBER_REFRESH_TOKEN || ''
+refresh = refresh || env('JOBBER_REFRESH_TOKEN')
 let access = '', accessExp = 0
 export const state = { lastError: null, lastSaved: null, rotated: false }
 
@@ -32,10 +33,19 @@ function keep(tok) {
 }
 
 async function token(body) {
-  const r = await fetch(BASE + '/api/oauth/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_id: ID, client_secret: SECRET, ...body }) })
-  const j = await r.json().catch(() => ({}))
-  if (!r.ok || !j.access_token) throw new Error(`Jobber token ${r.status}: ${String(j.error_description || j.error || j.message || '').slice(0, 160)}`)
-  keep(j); return j
+  const params = new URLSearchParams({ client_id: ID, client_secret: SECRET, ...body })
+  // form body first (current docs); Jobber's older docs pass the same values in the query string, so fall back to that
+  const tries = [() => fetch(BASE + '/api/oauth/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded', accept: 'application/json' }, body: params }),
+    () => fetch(BASE + '/api/oauth/token?' + params, { method: 'POST', headers: { accept: 'application/json' } })]
+  let last = ''
+  for (const t of tries) {
+    const r = await t(); const txt = await r.text(); let j = {}
+    try { j = JSON.parse(txt) } catch {}
+    if (r.ok && j.access_token) { keep(j); return j }
+    last = `${r.status}: ${String(j.error_description || j.error || j.message || txt || 'no reason given').replace(/\s+/g, ' ').slice(0, 160)}`
+    console.error('jobber token refused', last, '| id', ID.length, 'chars, secret', SECRET.length, 'chars,', body.grant_type, body.redirect_uri || '')
+  }
+  throw new Error('Jobber token ' + last)
 }
 
 async function accessToken() {
