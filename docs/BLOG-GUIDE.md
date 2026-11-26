@@ -77,10 +77,10 @@ Body:
 6. On "approve": set `status: published`, rebuild, qa, merge the branch into main, push main (Railway deploys in ~3 min), confirm https://www.ottawadeckpro.ca/post/<slug> loads, delete the branch.
 7. On changes: edit, rebuild, republish the preview, ask again.
 8. Google Business Profile update (owner, Nov 26): after a post is live, schedule a Google update for it (Supermetrics `manage_social_media`, ds_id GMB, account `115574972783296646741_5830531516746252146` "Ottawa DeckPro"). Content type IMAGE, the post's cover photo as `https://www.ottawadeckpro.ca/img/<file>`, topic_type STANDARD, call_to_action LEARN_MORE to `https://www.ottawadeckpro.ca/post/<slug>`. Caption: 2 to 4 short sentences, keyword + Ottawa, only facts from the post and owner prices, no phone number, no em dashes, never prices from the old Wix posts.
-   - Cadence: twice a week, Tuesday and Friday 10:13 AM America/Toronto (move off Dec 25 / Jan 1 to the day before). Check `status` (state scheduled) and take the next free slot after the last scheduled post. No two updates use the same photo.
+   - Cadence (owner, Nov 26): the first batch runs twice a week (Tue/Fri) until Fri Jan 29 2027. From Mon Feb 1 2027: three a week, Monday, Wednesday and Friday at 10:13 AM America/Toronto (move off Dec 25 / Jan 1 to the day before). Check `status` (state scheduled) and take the next free Mon/Wed/Fri slot after the last scheduled post. No two updates use the same photo.
    - Google only accepts schedules up to 75 days ahead. If the next free slot is further out, add the post to `docs/gbp-queue.md` (slug, caption, photo) and schedule it on a later run when the slot comes within 75 days. Each run first tops up the schedule from that queue.
    - Each scheduled update returns an approval link that only the owner can click (valid about 30 minutes). Send it to him in the same message that confirms the post is live. Never open it yourself.
-   - Nov 26 2026: all 19 posts up to then are posted or scheduled (last slot Fri Jan 29 2027). The next free slot is Tue Feb 2 2027.
+   - Nov 26 2026: all 19 posts up to then are posted or scheduled (last slot Fri Jan 29 2027). The next free slot is Mon Feb 1 2027.
 
 ## Photo list (public/img; use only these)
 - luxury-composite-deck-covered-patio-ottawa.webp: Custom composite deck with picture-frame border, lit stairs and lounge furniture under a covered balcony in Ottawa
