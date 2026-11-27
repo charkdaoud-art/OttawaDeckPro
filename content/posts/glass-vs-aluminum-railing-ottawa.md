@@ -8,7 +8,7 @@ cover: second-storey-composite-deck-glass-railing-ottawa.webp
 coverAlt: Second-storey composite deck with black-framed glass railing in Ottawa
 keyword: glass vs aluminum railing Ottawa
 category: Railings
-status: draft
+status: published
 ---
 Picking a railing is one of the biggest choices on a new deck. It frames the view, sets the style of the whole backyard and makes up a real share of the budget. When homeowners compare **glass vs aluminum railing in Ottawa**, it usually comes down to three things: price, look and maintenance.
 
