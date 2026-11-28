@@ -8,7 +8,7 @@ cover: durable-pvc-deck-ottawa.webp
 coverAlt: Multi-level composite deck with diamond inlay and black aluminum railing in Ottawa
 keyword: best deck material for Ottawa winters
 category: Materials
-status: draft
+status: published
 ---
 An Ottawa deck spends months under snow. It goes through freeze and thaw, spring melt and wet falls before it ever sees a barbecue. So when homeowners ask us about the **best deck material for Ottawa winters**, they really want to know one thing: what will still look good, and stay solid, after years of that?
 
